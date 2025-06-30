@@ -2,14 +2,17 @@
 import { supabase } from './supabaseClient.js';
 
 // Produtos
+
 export async function getProducts() {
     const { data, error } = await supabase
         .from('produtos')
-        .select('*')
+        .select(`id, nome, tipo, quantidade, data_validade`) // selecione só os campos que usa
         .order('nome', { ascending: true });
     if (error) throw error;
     return data;
 }
+
+// restante do código permanece igual...
 
 export async function createProduct(productData) {
     const { data, error } = await supabase
@@ -35,6 +38,8 @@ export async function deleteProduct(id) {
         .eq('id', id);
     if (error) throw error;
 }
+
+// Outras funções continuam iguais...
 
 export async function relocateProduct(productId, data) {
     const { data: produto, error } = await supabase

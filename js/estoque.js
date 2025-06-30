@@ -1,3 +1,4 @@
+// estoque.js
 import { getProducts, updateProduct } from './api.js';
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -24,9 +25,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     async function carregarEstoque() {
         try {
             estoque = await getProducts();
+            console.log('Produtos carregados:', estoque);
+
+            if (!Array.isArray(estoque) || estoque.length === 0) {
+                console.warn('Nenhum produto encontrado no estoque');
+            }
             aplicarFiltros();
         } catch (error) {
             alert('Erro ao carregar estoque: ' + error.message);
+            console.error(error);
         }
     }
 
@@ -38,20 +45,20 @@ document.addEventListener('DOMContentLoaded', async function() {
         tabelaEstoque.innerHTML = '';
 
         estoque.filter(item => {
-            const textoMatch = item.nome.toLowerCase().includes(filtroTexto) ||
-                               (item.codigo ? item.codigo.toLowerCase().includes(filtroTexto) : false);
+            const textoMatch = item.nome.toLowerCase().includes(filtroTexto);
             const categoriaMatch = !filtroCat || item.tipo === filtroCat;
             return textoMatch && categoriaMatch;
         }).forEach(item => {
             const row = tabelaEstoque.insertRow();
             const icon = getCategoryIcon(item.tipo);
+            const validadeFormatada = item.data_validade ? new Date(item.data_validade).toLocaleDateString('pt-BR') : '-';
 
             row.innerHTML = `
-                <td>${item.codigo || ''}</td>
+                <td>${item.id}</td>
                 <td>${item.nome}</td>
                 <td><span class="category">${icon} ${formatCategory(item.tipo)}</span></td>
                 <td>${item.quantidade}</td>
-                <td>${item.localizacao || '-'}</td>
+                <td>${validadeFormatada}</td>
                 <td>
                     <button class="btn primary btn-sm retirar-btn" data-id="${item.id}">
                         <i class="fas fa-minus-circle"></i> Retirar
@@ -76,17 +83,21 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.getElementById('quantidadeDisponivel').value = item.quantidade;
         document.getElementById('quantidadeRetirada').max = item.quantidade;
         document.getElementById('quantidadeRetirada').value = 1;
-        document.getElementById('motivoRetirada').value = '';
+        document.getElementById('responsavel').value = '';
+        document.getElementById('observacao').value = '';
         modal.style.display = 'block';
+        modal.removeAttribute('hidden');
     }
 
     closeBtn.addEventListener('click', () => {
         modal.style.display = 'none';
+        modal.setAttribute('hidden', 'true');
     });
 
     window.addEventListener('click', e => {
         if (e.target == modal) {
             modal.style.display = 'none';
+            modal.setAttribute('hidden', 'true');
         }
     });
 
@@ -96,15 +107,16 @@ document.addEventListener('DOMContentLoaded', async function() {
         const nome = document.getElementById('itemNome').value;
         const disponivel = parseInt(document.getElementById('quantidadeDisponivel').value);
         const retirada = parseInt(document.getElementById('quantidadeRetirada').value);
-        const motivo = document.getElementById('motivoRetirada').value.trim();
+        const responsavel = document.getElementById('responsavel').value.trim();
+        const observacao = document.getElementById('observacao').value.trim();
 
         if (retirada <= 0 || retirada > disponivel) {
             alert('Quantidade inválida para retirada.');
             return;
         }
 
-        if (!motivo) {
-            alert('Informe o motivo da retirada.');
+        if (!responsavel) {
+            alert('Informe o responsável pela retirada.');
             return;
         }
 
@@ -124,12 +136,14 @@ document.addEventListener('DOMContentLoaded', async function() {
                 id,
                 nome,
                 quantidade: retirada,
-                motivo,
+                responsavel,
+                observacao,
                 data: new Date().toLocaleString('pt-BR')
             });
 
             alert('Retirada realizada com sucesso!');
             modal.style.display = 'none';
+            modal.setAttribute('hidden', 'true');
             aplicarFiltros();
 
         } catch (error) {
@@ -140,10 +154,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     function formatCategory(tipo) {
         switch (tipo) {
             case 'perecivel': return 'Perecível';
-            case 'limpeza': return 'Limpeza';
-            case 'escritorio': return 'Escritório';
-            case 'informatica': return 'Informática';
-            case 'outros': return 'Outros';
+            case 'roupa': return 'Roupa';
+            case 'eletronico': return 'Eletrônico';
+            case 'moveis': return 'Móveis';
+            case 'ferramentas': return 'Ferramentas';
             default: return tipo;
         }
     }
@@ -151,10 +165,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     function getCategoryIcon(tipo) {
         switch (tipo) {
             case 'perecivel': return '🍎';
-            case 'limpeza': return '🧴';
-            case 'escritorio': return '📄';
-            case 'informatica': return '💻';
-            case 'outros': return '📦';
+            case 'roupa': return '👕';
+            case 'eletronico': return '📱';
+            case 'moveis': return '🛋️';
+            case 'ferramentas': return '🔧';
             default: return '❓';
         }
     }
