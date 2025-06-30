@@ -1,111 +1,119 @@
-const API_BASE_URL = 'https://sua-api.com/v1';
+import { supabase } from './supabaseClient.js';
 
-// Função para fazer requisições genéricas
-async function makeRequest(endpoint, method = 'GET', body = null, requiresAuth = true) {
-    const headers = {
-        'Content-Type': 'application/json'
-    };
-
-    if (requiresAuth) {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('Autenticação necessária');
-        }
-        headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const options = {
-        method,
-        headers
-    };
-
-    if (body) {
-        options.body = JSON.stringify(body);
-    }
-
-    try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-
-        if (response.status === 401) {
-            // Token inválido ou expirado
-            localStorage.removeItem('token');
-            localStorage.removeItem('currentUser');
-            window.location.href = 'index.html?sessionExpired=true';
-            return;
-        }
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Erro na requisição');
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error('Erro na requisição:', error);
-        throw error;
-    }
-}
-
-// Funções específicas para usuários
-export async function registerUser(userData) {
-    return makeRequest('/users/register', 'POST', userData, false);
-}
-
-export async function loginUser(credentials) {
-    return makeRequest('/users/login', 'POST', credentials, false);
-}
-
+// Funções para usuários (simples, usando supabase.auth para login/registro se quiser)
+// Aqui exemplo simples para pegar dados do usuário autenticado
 export async function getCurrentUser() {
-    return makeRequest('/users/me');
+    const user = supabase.auth.user();
+    return user;
 }
 
-// Funções para produtos
+// Produtos
 export async function getProducts() {
-    return makeRequest('/products');
+    const { data, error } = await supabase
+        .from('produtos')
+        .select('*')
+        .order('nome', { ascending: true });
+    if (error) throw error;
+    return data;
 }
 
 export async function createProduct(productData) {
-    return makeRequest('/products', 'POST', productData);
+    const { data, error } = await supabase
+        .from('produtos')
+        .insert([productData]);
+    if (error) throw error;
+    return data;
 }
 
 export async function updateProduct(id, productData) {
-    return makeRequest(`/products/${id}`, 'PUT', productData);
+    const { data, error } = await supabase
+        .from('produtos')
+        .update(productData)
+        .eq('id', id);
+    if (error) throw error;
+    return data;
 }
 
 export async function deleteProduct(id) {
-    return makeRequest(`/products/${id}`, 'DELETE');
+    const { error } = await supabase
+        .from('produtos')
+        .delete()
+        .eq('id', id);
+    if (error) throw error;
 }
 
-export async function uploadProductImages(productId, images) {
-    const formData = new FormData();
-    images.forEach((image, index) => {
-        formData.append(`images`, image);
-    });
-
-    const response = await fetch(`${API_BASE_URL}/products/${productId}/images`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: formData
-    });
-
-    if (!response.ok) {
-        throw new Error('Erro ao enviar imagens');
-    }
-
-    return await response.json();
-}
-
-// Funções administrativas
-export async function getAllUsers() {
-    return makeRequest('/admin/users');
-}
-
+// Realocar produto (registra movimentação e atualiza estoque)
 export async function relocateProduct(productId, data) {
-    return makeRequest(`/admin/products/${productId}/relocate`, 'POST', data);
+    // Busca produto atual
+    const { data: produto, error } = await supabase
+        .from('produtos')
+        .select('*')
+        .eq('id', productId)
+        .single();
+    if (error) throw error;
+
+    const novaQuantidade = produto.quantidade - data.quantity;
+    if (novaQuantidade < 0) throw new Error('Quantidade insuficiente para realocação');
+
+    // Atualiza estoque
+    const { error: errUpdate } = await supabase
+        .from('produtos')
+        .update({ quantidade: novaQuantidade })
+        .eq('id', productId);
+    if (errUpdate) throw errUpdate;
+
+    // Registra movimentação
+    const { error: errMov } = await supabase
+        .from('movimentacoes')
+        .insert([{
+            data: new Date().toISOString(),
+            produto_id: productId,
+            tipo: 'Realocação',
+            quantidade: data.quantity,
+            destino: data.destination,
+            responsavel: data.responsavel || 'ADM001',
+            motivo: data.reason || ''
+        }]);
+    if (errMov) throw errMov;
+
+    return true;
 }
 
+// Estatísticas do sistema
 export async function getSystemStats() {
-    return makeRequest('/admin/stats');
+    const { count: totalProducts, error: err1 } = await supabase
+        .from('produtos')
+        .select('*', { count: 'exact', head: true });
+    if (err1) throw err1;
+
+    // Exemplo fixo, ajuste conforme sua base
+    const totalUsers = 10;
+
+    const { count: lowStockProducts, error: err2 } = await supabase
+        .from('produtos')
+        .select('*', { count: 'exact', head: true })
+        .lt('quantidade', 5);
+    if (err2) throw err2;
+
+    return { totalProducts, totalUsers, lowStockProducts };
+}
+
+// Movimentações
+export async function getMovements() {
+    const { data, error } = await supabase
+        .from('movimentacoes')
+        .select(`
+            data,
+            tipo,
+            quantidade,
+            destino,
+            responsavel,
+            motivo,
+            produtos:produto_id (nome)
+        `)
+        .order('data', { ascending: false })
+        .limit(20);
+
+    if (error) throw error;
+    return data;
 }

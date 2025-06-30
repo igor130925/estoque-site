@@ -1,4 +1,6 @@
-document.addEventListener('DOMContentLoaded', function() {
+import { getProducts, updateProduct } from './api.js';
+
+document.addEventListener('DOMContentLoaded', async function() {
     // Verificar autenticação
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) {
@@ -6,21 +8,11 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    // Exibir nome do usuário
     document.getElementById('currentUser').textContent = currentUser.name;
 
-    // Dados de exemplo (substituir por chamada à API)
-    let estoque = [
-        { id: 1, codigo: 'P001', nome: 'Notebook Dell', categoria: 'eletronico', quantidade: 15, localizacao: 'Armário A1' },
-        { id: 2, codigo: 'P002', nome: 'Mouse Sem Fio', categoria: 'eletronico', quantidade: 32, localizacao: 'Gaveta B2' },
-        { id: 3, codigo: 'P003', nome: 'Cadeira Escritório', categoria: 'mobilia', quantidade: 8, localizacao: 'Setor C3' },
-        { id: 4, codigo: 'P004', nome: 'Papel A4', categoria: 'material', quantidade: 50, localizacao: 'Prateleira D4' },
-        { id: 5, codigo: 'P005', nome: 'Caneta Azul', categoria: 'material', quantidade: 120, localizacao: 'Gaveta B3' }
-    ];
-
+    let estoque = [];
     let historicoRetiradas = [];
 
-    // Elementos do DOM
     const tabelaEstoque = document.getElementById('tabelaEstoque').getElementsByTagName('tbody')[0];
     const filtroBusca = document.getElementById('filtroBusca');
     const filtroCategoria = document.getElementById('filtroCategoria');
@@ -28,30 +20,38 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeBtn = document.querySelector('.close-btn');
     const formRetirada = document.getElementById('formRetirada');
 
-    // Carregar dados na tabela
-    function carregarEstoque() {
+    // Carregar produtos do Supabase
+    async function carregarEstoque() {
+        try {
+            estoque = await getProducts();
+            aplicarFiltros();
+        } catch (error) {
+            alert('Erro ao carregar estoque: ' + error.message);
+        }
+    }
+
+    // Aplica filtros e atualiza tabela
+    function aplicarFiltros() {
         const filtroTexto = filtroBusca.value.toLowerCase();
         const filtroCat = filtroCategoria.value;
 
         tabelaEstoque.innerHTML = '';
 
         estoque.filter(item => {
-            const textoMatch = item.nome.toLowerCase().includes(filtroTexto) || 
-                              item.codigo.toLowerCase().includes(filtroTexto);
-            const categoriaMatch = !filtroCat || item.categoria === filtroCat;
+            const textoMatch = item.nome.toLowerCase().includes(filtroTexto) ||
+                               (item.codigo ? item.codigo.toLowerCase().includes(filtroTexto) : false);
+            const categoriaMatch = !filtroCat || item.tipo === filtroCat;
             return textoMatch && categoriaMatch;
         }).forEach(item => {
             const row = tabelaEstoque.insertRow();
-            
-            // Ícone da categoria
-            const icon = getCategoryIcon(item.categoria);
-            
+            const icon = getCategoryIcon(item.tipo);
+
             row.innerHTML = `
-                <td>${item.codigo}</td>
+                <td>${item.codigo || ''}</td>
                 <td>${item.nome}</td>
-                <td><span class="category">${icon} ${formatCategory(item.categoria)}</span></td>
+                <td><span class="category">${icon} ${formatCategory(item.tipo)}</span></td>
                 <td>${item.quantidade}</td>
-                <td>${item.localizacao}</td>
+                <td>${item.localizacao || '-'}</td>
                 <td>
                     <button class="btn primary btn-sm retirar-btn" data-id="${item.id}">
                         <i class="fas fa-minus-circle"></i> Retirar
@@ -60,7 +60,6 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         });
 
-        // Adicionar eventos aos botões de retirada
         document.querySelectorAll('.retirar-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 abrirModalRetirada(this.dataset.id);
@@ -68,7 +67,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Abrir modal para registrar retirada
     function abrirModalRetirada(itemId) {
         const item = estoque.find(i => i.id == itemId);
         if (!item) return;
@@ -78,94 +76,91 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('quantidadeDisponivel').value = item.quantidade;
         document.getElementById('quantidadeRetirada').max = item.quantidade;
         document.getElementById('quantidadeRetirada').value = 1;
-        document.getElementById('responsavel').value = currentUser.name;
-        document.getElementById('observacao').value = '';
-
-        modal.style.display = 'flex';
+        document.getElementById('motivoRetirada').value = '';
+        modal.style.display = 'block';
     }
 
-    // Fechar modal
-    function fecharModal() {
+    closeBtn.addEventListener('click', () => {
         modal.style.display = 'none';
-    }
+    });
 
-    // Formatar categoria para exibição
-    function formatCategory(category) {
-        const categories = {
-            'eletronico': 'Eletrônico',
-            'mobilia': 'Mobília',
-            'material': 'Material',
-            'ferramenta': 'Ferramenta',
-            'perecivel': 'Perecível'
-        };
-        return categories[category] || category;
-    }
+    window.addEventListener('click', e => {
+        if (e.target == modal) {
+            modal.style.display = 'none';
+        }
+    });
 
-    // Obter ícone da categoria
-    function getCategoryIcon(category) {
-        const icons = {
-            'eletronico': '💻',
-            'mobilia': '🪑',
-            'material': '📎',
-            'ferramenta': '🔧',
-            'perecivel': '🍎'
-        };
-        return icons[category] || '📦';
-    }
-
-    // Registrar retirada
-    formRetirada.addEventListener('submit', function(e) {
+    formRetirada.addEventListener('submit', async e => {
         e.preventDefault();
-        
-        const itemId = parseInt(document.getElementById('itemId').value);
-        const quantidadeRetirada = parseInt(document.getElementById('quantidadeRetirada').value);
-        const responsavel = document.getElementById('responsavel').value;
-        const observacao = document.getElementById('observacao').value;
-        
-        // Encontrar item no estoque
-        const itemIndex = estoque.findIndex(item => item.id === itemId);
-        if (itemIndex === -1) return;
-        
-        // Verificar quantidade disponível
-        if (quantidadeRetirada > estoque[itemIndex].quantidade) {
-            alert('Quantidade solicitada maior que o disponível');
+        const id = document.getElementById('itemId').value;
+        const nome = document.getElementById('itemNome').value;
+        const disponivel = parseInt(document.getElementById('quantidadeDisponivel').value);
+        const retirada = parseInt(document.getElementById('quantidadeRetirada').value);
+        const motivo = document.getElementById('motivoRetirada').value.trim();
+
+        if (retirada <= 0 || retirada > disponivel) {
+            alert('Quantidade inválida para retirada.');
             return;
         }
-        
-        // Atualizar estoque
-        estoque[itemIndex].quantidade -= quantidadeRetirada;
-        
-        // Registrar retirada no histórico
-        const retirada = {
-            id: Date.now(),
-            itemId,
-            itemCodigo: estoque[itemIndex].codigo,
-            itemNome: estoque[itemIndex].nome,
-            quantidade: quantidadeRetirada,
-            responsavel,
-            data: new Date().toISOString(),
-            observacao
-        };
-        
-        historicoRetiradas.push(retirada);
-        
-        // Atualizar tabela e fechar modal
-        carregarEstoque();
-        fecharModal();
-        
-        alert(`Retirada de ${quantidadeRetirada} unidade(s) de ${estoque[itemIndex].nome} registrada com sucesso!`);
-    });
 
-    // Event listeners
-    filtroBusca.addEventListener('input', carregarEstoque);
-    filtroCategoria.addEventListener('change', carregarEstoque);
-    closeBtn.addEventListener('click', fecharModal);
-    window.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            fecharModal();
+        if (!motivo) {
+            alert('Informe o motivo da retirada.');
+            return;
+        }
+
+        try {
+            const itemIndex = estoque.findIndex(i => i.id == id);
+            if (itemIndex === -1) throw new Error('Produto não encontrado');
+
+            // Atualizar quantidade no Supabase
+            const novaQtd = estoque[itemIndex].quantidade - retirada;
+            await updateProduct(id, { quantidade: novaQtd });
+
+            // Atualiza localmente para refletir mudança
+            estoque[itemIndex].quantidade = novaQtd;
+
+            // Adicionar ao histórico
+            historicoRetiradas.push({
+                id,
+                nome,
+                quantidade: retirada,
+                motivo,
+                data: new Date().toLocaleString('pt-BR')
+            });
+
+            alert('Retirada realizada com sucesso!');
+            modal.style.display = 'none';
+            aplicarFiltros();
+
+        } catch (error) {
+            alert('Erro ao registrar retirada: ' + error.message);
         }
     });
 
-    // Carregar dados iniciais
-    carregarEstoque();
+    function formatCategory(tipo) {
+        switch (tipo) {
+            case 'perecivel': return 'Perecível';
+            case 'limpeza': return 'Limpeza';
+            case 'escritorio': return 'Escritório';
+            case 'informatica': return 'Informática';
+            case 'outros': return 'Outros';
+            default: return tipo;
+        }
+    }
+
+    function getCategoryIcon(tipo) {
+        switch (tipo) {
+            case 'perecivel': return '🍎';
+            case 'limpeza': return '🧴';
+            case 'escritorio': return '📄';
+            case 'informatica': return '💻';
+            case 'outros': return '📦';
+            default: return '❓';
+        }
+    }
+
+    filtroBusca.addEventListener('input', aplicarFiltros);
+    filtroCategoria.addEventListener('change', aplicarFiltros);
+
+    await carregarEstoque();
 });

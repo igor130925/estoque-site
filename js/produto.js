@@ -1,5 +1,6 @@
+import { createProduct } from './api.js';
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Elementos do DOM
     const productForm = document.getElementById('productForm');
     const imageInput = document.getElementById('productImages');
     const imagePreview = document.getElementById('imagePreview');
@@ -10,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const mobileMenu = document.getElementById('mobileMenu');
     const closeMenu = document.getElementById('closeMenu');
 
-    // Menu mobile
     menuBtn.addEventListener('click', function() {
         mobileMenu.style.display = 'block';
     });
@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', function() {
         mobileMenu.style.display = 'none';
     });
 
-    // Mostrar/ocultar campo de data baseado no tipo de produto
     productType.addEventListener('change', function() {
         if (this.value === 'perecivel') {
             dateField.style.display = 'block';
@@ -30,19 +29,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Preview de imagens
     imageInput.addEventListener('change', function() {
         imagePreview.innerHTML = '';
-        
+
         if (this.files.length > 4) {
             alert('Você pode selecionar no máximo 4 imagens');
             this.value = '';
             return;
         }
-        
+
         Array.from(this.files).forEach(file => {
             if (!file.type.match('image.*')) return;
-            
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = document.createElement('img');
@@ -54,62 +52,48 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Enviar formulário
-    productForm.addEventListener('submit', function(e) {
+    productForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
-        // Obter valores
+
         const productData = {
-            name: document.getElementById('productName').value.trim(),
-            quantity: parseInt(document.getElementById('productQuantity').value),
-            type: productType.value,
-            date: productType.value === 'perecivel' ? document.getElementById('productDate').value : null,
-            images: imageInput.files
+            nome: document.getElementById('productName').value.trim(),
+            quantidade: parseInt(document.getElementById('productQuantity').value),
+            tipo: productType.value,
+            data_validade: productType.value === 'perecivel' ? document.getElementById('productDate').value : null,
+            // imagens: imageInput.files // Upload separado
         };
-        
-        // Validações
-        if (!productData.name) {
+
+        if (!productData.nome) {
             alert('Nome do produto é obrigatório');
             return;
         }
-        
-        if (isNaN(productData.quantity) || productData.quantity < 0) {
+
+        if (isNaN(productData.quantidade) || productData.quantidade < 0) {
             alert('Quantidade inválida');
             return;
         }
-        
-        if (!productData.type) {
+
+        if (!productData.tipo) {
             alert('Tipo do produto é obrigatório');
             return;
         }
-        
-        if (productData.type === 'perecivel' && !productData.date) {
+
+        if (productData.tipo === 'perecivel' && !productData.data_validade) {
             alert('Data de validade é obrigatória para produtos perecíveis');
             return;
         }
-        
-        // Salvar produto (simulação)
-        saveProduct(productData);
-    });
 
-    // Função simulada para salvar produto
-    function saveProduct(productData) {
-        // Simular chamada à API
-        setTimeout(() => {
-            console.log('Produto salvo:', productData);
-            
-            // Mostrar mensagem de sucesso
+        try {
+            await createProduct(productData);
             successMessage.style.display = 'flex';
-            
-            // Esconder mensagem após 3 segundos
             setTimeout(() => {
                 successMessage.style.display = 'none';
             }, 3000);
-            
-            // Resetar formulário
             productForm.reset();
             imagePreview.innerHTML = '';
             dateField.style.display = 'none';
-        }, 1000);
-    }
+        } catch (error) {
+            alert('Erro ao salvar produto: ' + error.message);
+        }
+    });
 });

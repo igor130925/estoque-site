@@ -1,31 +1,61 @@
-document.addEventListener('DOMContentLoaded', function () {
-  // Função para gerar código aleatório 6 dígitos alfanuméricos
-  function generateRandomCode() {
-    const chars = '1234567890';  
-    
-    let code = '';
+import { supabase } from '../supabaseClient.js'; // ajuste o caminho conforme seu projeto
+
+// Função para gerar código pessoa único (6 caracteres)
+async function generateUniquePersonCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code;
+  let exists = true;
+
+  while (exists) {
+    code = '';
     for (let i = 0; i < 6; i++) {
       code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    return code;
-  }
+    console.log('Código gerado:', code);
 
-  const registerForm = document.getElementById('registerForm');
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select('personCode')
+      .eq('personCode', code)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      // PGRST116 = Not found (tudo bem se não encontrar)
+      console.error('Erro ao consultar código no banco:', error);
+      throw error;
+    }
+
+    exists = !!data; // se data existe, código já está em uso, repete
+  }
+  return code;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const generateBtn = document.getElementById('generateCode');
   const personCodeInput = document.getElementById('personCode');
-  const generateCodeBtn = document.getElementById('generateCode');
   const errorMessage = document.getElementById('errorMessage');
 
-  // Gera código inicial no input
-  personCodeInput.value = generateRandomCode();
+  generateBtn.addEventListener('click', async () => {
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
 
-  // Gerar novo código ao clicar no botão
-  generateCodeBtn.addEventListener('click', function () {
-    personCodeInput.value = generateRandomCode();
+    try {
+      const code = await generateUniquePersonCode();
+      personCodeInput.value = code;
+      errorMessage.textContent = '';
+    } catch (err) {
+      errorMessage.textContent = 'Erro ao gerar código: ' + err.message;
+    } finally {
+      generateBtn.disabled = false;
+      generateBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Gerar';
+    }
   });
 
-  registerForm.addEventListener('submit', function (e) {
+  // Aqui você pode adicionar o submit do formulário para cadastrar no Supabase, se quiser
+  // Exemplo simples:
+  const registerForm = document.getElementById('registerForm');
+  registerForm.addEventListener('submit', async e => {
     e.preventDefault();
-    errorMessage.textContent = '';
 
     const name = document.getElementById('name').value.trim();
     const personCode = personCodeInput.value.trim();
@@ -33,51 +63,31 @@ document.addEventListener('DOMContentLoaded', function () {
     const confirmPassword = document.getElementById('confirmPassword').value;
 
     if (!name || !personCode || !password || !confirmPassword) {
-      errorMessage.textContent = 'Todos os campos são obrigatórios';
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      errorMessage.textContent = 'As senhas não coincidem';
+      errorMessage.textContent = 'Preencha todos os campos.';
       return;
     }
 
     if (password.length < 6) {
-      errorMessage.textContent = 'A senha deve ter no mínimo 6 caracteres';
+      errorMessage.textContent = 'Senha deve ter no mínimo 6 caracteres.';
       return;
     }
 
-    if (!personCode.match(/^[A-Z0-9]{6}$/)) {
-      errorMessage.textContent = 'Código pessoa inválido';
+    if (password !== confirmPassword) {
+      errorMessage.textContent = 'Senhas não conferem.';
       return;
     }
 
-    // Recupera usuários existentes ou inicia lista vazia
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    // Tenta cadastrar no Supabase
+    const { data, error } = await supabase.from('usuarios').insert([
+      { name, personCode, password, role: 'user' } // ajuste os campos conforme seu banco
+    ]);
 
-    // Verifica se código já existe
-    if (users.some((u) => u.personCode === personCode)) {
-      errorMessage.textContent = 'Código Pessoa já cadastrado';
+    if (error) {
+      errorMessage.textContent = 'Erro ao cadastrar: ' + error.message;
       return;
     }
 
-    // Cria novo usuário com role padrão 'user'
-    const newUser = {
-      name,
-      personCode,
-      password,
-      role: 'user',
-    };
-
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-
-    // Simula criação de token e salva sessão
-    const fakeToken = 'token-' + Math.random().toString(36).substr(2);
-    localStorage.setItem('token', fakeToken);
-    localStorage.setItem('currentUser', JSON.stringify(newUser));
-
-    // Redireciona para página produtos
-    window.location.href = 'produtos.html';
+    alert('Cadastro realizado com sucesso!');
+    window.location.href = 'index.html'; // redireciona para login
   });
 });

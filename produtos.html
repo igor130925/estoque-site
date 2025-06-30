@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Produtos - Sistema de Estoque</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
 </head>
 <body>
     <!-- Barra de navegação -->
@@ -16,7 +19,7 @@
             <nav class="desktop-nav">
                 <ul>
                     <li><a href="produtos.html"><i class="fas fa-boxes"></i> Produtos</a></li>
-                    <li><a href="estoque.html"fas fa-chart-bar"></i> Estoque  </a></li>
+                    <li><a href="estoque.html"><i class="fas fa-chart-bar"></i> Estoque</a></li>
                 </ul>
             </nav>
         </div>
@@ -24,7 +27,7 @@
 
     <!-- Menu mobile -->
     <div class="menu-mobile" id="mobileMenu">
-        <button class="close-btn" id="closeMenu">&times;</button>
+        <button class="close-btn" id="closeMenu" aria-label="Fechar menu">&times;</button>
         <div class="user-profile">
             <div class="user-avatar"><i class="fas fa-user-circle"></i></div>
             <div class="user-info">
@@ -49,16 +52,16 @@
                 <h1><i class="fas fa-boxes"></i> Cadastrar Produto</h1>
             </div>
             <div class="card-body">
-                <form id="productForm">
+                <form id="productForm" autocomplete="off" novalidate>
                     <div class="form-group">
                         <label for="productName"><i class="fas fa-tag"></i> Nome do Produto</label>
-                        <input type="text" id="productName" required>
+                        <input type="text" id="productName" required autocomplete="off" />
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label for="productQuantity"><i class="fas fa-cubes"></i> Quantidade</label>
-                            <input type="number" id="productQuantity" required min="0">
+                            <input type="number" id="productQuantity" required min="0" autocomplete="off" />
                         </div>
                         <div class="form-group">
                             <label for="productType"><i class="fas fa-list"></i> Tipo</label>
@@ -76,17 +79,24 @@
                     <!-- Campo de validade oculto inicialmente -->
                     <div class="form-group" id="dateField" style="display: none;">
                         <label for="productDate"><i class="fas fa-calendar-alt"></i> Data de Validade</label>
-                        <input type="date" id="productDate">
+                        <input type="date" id="productDate" />
                     </div>
 
                     <div class="form-group">
                         <label for="productImages"><i class="fas fa-images"></i> Imagens (máx. 4)</label>
-                        <input type="file" id="productImages" multiple accept="image/*">
+                        <input
+                          type="file"
+                          id="productImages"
+                          multiple
+                          accept="image/*"
+                          aria-describedby="imageHelp"
+                        />
+                        <small id="imageHelp" class="form-hint">Selecione até 4 imagens</small>
                         <div class="image-preview" id="imagePreview"></div>
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn primary">
+                        <button type="submit" class="btn primary" aria-label="Salvar produto">
                             <i class="fas fa-save"></i> Salvar Produto
                         </button>
                     </div>
@@ -97,8 +107,7 @@
 
     <!-- Mensagem de sucesso -->
     <div class="success-message" id="successMessage" style="display: none;">
-        <i class="fas fa-check-circle"></i>
-        Produto cadastrado com sucesso!
+        <i class="fas fa-check-circle"></i> Produto cadastrado com sucesso!
     </div>
 
     <!-- Script -->
