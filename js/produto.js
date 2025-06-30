@@ -1,6 +1,7 @@
+// js/produto.js
 import { createProduct } from './api.js';
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const productForm = document.getElementById('productForm');
     const imageInput = document.getElementById('productImages');
     const imagePreview = document.getElementById('imagePreview');
@@ -11,15 +12,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const mobileMenu = document.getElementById('mobileMenu');
     const closeMenu = document.getElementById('closeMenu');
 
-    menuBtn.addEventListener('click', function() {
+    menuBtn.addEventListener('click', () => {
         mobileMenu.style.display = 'block';
     });
 
-    closeMenu.addEventListener('click', function() {
+    closeMenu.addEventListener('click', () => {
         mobileMenu.style.display = 'none';
     });
 
-    productType.addEventListener('change', function() {
+    productType.addEventListener('change', function () {
         if (this.value === 'perecivel') {
             dateField.style.display = 'block';
             document.getElementById('productDate').required = true;
@@ -29,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    imageInput.addEventListener('change', function() {
+    imageInput.addEventListener('change', function () {
         imagePreview.innerHTML = '';
 
         if (this.files.length > 4) {
@@ -42,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!file.type.match('image.*')) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const img = document.createElement('img');
                 img.src = e.target.result;
                 img.className = 'preview-thumb';
@@ -52,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    productForm.addEventListener('submit', async function(e) {
+    productForm.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         const productData = {
@@ -60,28 +61,13 @@ document.addEventListener('DOMContentLoaded', function() {
             quantidade: parseInt(document.getElementById('productQuantity').value),
             tipo: productType.value,
             data_validade: productType.value === 'perecivel' ? document.getElementById('productDate').value : null,
-            // imagens: imageInput.files // Upload separado
         };
 
-        if (!productData.nome) {
-            alert('Nome do produto é obrigatório');
-            return;
-        }
-
-        if (isNaN(productData.quantidade) || productData.quantidade < 0) {
-            alert('Quantidade inválida');
-            return;
-        }
-
-        if (!productData.tipo) {
-            alert('Tipo do produto é obrigatório');
-            return;
-        }
-
-        if (productData.tipo === 'perecivel' && !productData.data_validade) {
-            alert('Data de validade é obrigatória para produtos perecíveis');
-            return;
-        }
+        if (!productData.nome) return alert('Nome do produto é obrigatório');
+        if (isNaN(productData.quantidade) || productData.quantidade < 0) return alert('Quantidade inválida');
+        if (!productData.tipo) return alert('Tipo do produto é obrigatório');
+        if (productData.tipo === 'perecivel' && !productData.data_validade)
+            return alert('Data de validade é obrigatória para produtos perecíveis');
 
         try {
             await createProduct(productData);

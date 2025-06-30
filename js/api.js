@@ -1,11 +1,5 @@
+// js/api.js
 import { supabase } from './supabaseClient.js';
-
-// Funções para usuários (simples, usando supabase.auth para login/registro se quiser)
-// Aqui exemplo simples para pegar dados do usuário autenticado
-export async function getCurrentUser() {
-    const user = supabase.auth.user();
-    return user;
-}
 
 // Produtos
 export async function getProducts() {
@@ -42,9 +36,7 @@ export async function deleteProduct(id) {
     if (error) throw error;
 }
 
-// Realocar produto (registra movimentação e atualiza estoque)
 export async function relocateProduct(productId, data) {
-    // Busca produto atual
     const { data: produto, error } = await supabase
         .from('produtos')
         .select('*')
@@ -55,14 +47,12 @@ export async function relocateProduct(productId, data) {
     const novaQuantidade = produto.quantidade - data.quantity;
     if (novaQuantidade < 0) throw new Error('Quantidade insuficiente para realocação');
 
-    // Atualiza estoque
     const { error: errUpdate } = await supabase
         .from('produtos')
         .update({ quantidade: novaQuantidade })
         .eq('id', productId);
     if (errUpdate) throw errUpdate;
 
-    // Registra movimentação
     const { error: errMov } = await supabase
         .from('movimentacoes')
         .insert([{
@@ -79,14 +69,12 @@ export async function relocateProduct(productId, data) {
     return true;
 }
 
-// Estatísticas do sistema
 export async function getSystemStats() {
     const { count: totalProducts, error: err1 } = await supabase
         .from('produtos')
         .select('*', { count: 'exact', head: true });
     if (err1) throw err1;
 
-    // Exemplo fixo, ajuste conforme sua base
     const totalUsers = 10;
 
     const { count: lowStockProducts, error: err2 } = await supabase
@@ -98,7 +86,6 @@ export async function getSystemStats() {
     return { totalProducts, totalUsers, lowStockProducts };
 }
 
-// Movimentações
 export async function getMovements() {
     const { data, error } = await supabase
         .from('movimentacoes')
@@ -113,7 +100,6 @@ export async function getMovements() {
         `)
         .order('data', { ascending: false })
         .limit(20);
-
     if (error) throw error;
     return data;
 }
