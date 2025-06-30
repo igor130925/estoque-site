@@ -1,3 +1,5 @@
+// auth.js
+
 // Gerar código pessoa aleatório de 6 dígitos alfanuméricos
 function generatePersonCode() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -8,45 +10,45 @@ function generatePersonCode() {
     return result;
 }
 
-// Verificar autenticação
+// Verificar autenticação e redirecionar se necessário
 function checkAuth() {
     const token = localStorage.getItem('token');
     const currentPage = window.location.pathname.split('/').pop();
-    
-    // Páginas que não requerem autenticação
-    const publicPages = ['index.html'];
-    
-    // Se não está autenticado e não está em página pública
+
+    // Páginas públicas que não exigem login
+    const publicPages = ['index.html', 'cadastro.html'];
+
+    // Se não autenticado e página não pública, redireciona para login
     if (!token && !publicPages.includes(currentPage)) {
         window.location.href = 'index.html';
         return false;
     }
-    
-    // Se está autenticado e está na página de login
+
+    // Se autenticado e está na página login, redireciona conforme role
     if (token && currentPage === 'index.html') {
         const user = JSON.parse(localStorage.getItem('currentUser'));
-        if (user.role === 'admin') {
+        if (user && user.role === 'admin') {
             window.location.href = 'admin.html';
         } else {
             window.location.href = 'produtos.html';
         }
         return false;
     }
-    
+
     return true;
 }
 
-// Verificar se usuário é admin
+// Verifica se usuário é admin
 function isAdmin() {
     const user = JSON.parse(localStorage.getItem('currentUser'));
     return user && user.role === 'admin';
 }
 
-// Configurar logout
+// Configura botão logout (presente em páginas protegidas)
 function setupLogout() {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', function(e) {
+        logoutBtn.addEventListener('click', e => {
             e.preventDefault();
             localStorage.removeItem('token');
             localStorage.removeItem('currentUser');
@@ -55,77 +57,73 @@ function setupLogout() {
     }
 }
 
-// Inicializar autenticação
+// Inicializa autenticação e configurações gerais ao carregar DOM
 function initAuth() {
     checkAuth();
     setupLogout();
-    
-    // Preencher informações do usuário se estiver logado
+
+    // Preenche nome e código do usuário na interface (se houver elementos)
     const user = JSON.parse(localStorage.getItem('currentUser'));
     if (user) {
         document.querySelectorAll('#userNameDisplay, #currentUserName').forEach(el => {
             el.textContent = user.name;
         });
-        
-        if (document.getElementById('userCodeDisplay')) {
-            document.getElementById('userCodeDisplay').textContent = user.code;
+        const userCodeDisplay = document.getElementById('userCodeDisplay');
+        if (userCodeDisplay) {
+            userCodeDisplay.textContent = user.personCode || user.code || '';
         }
     }
 }
 
-// Inicializar quando o DOM estiver pronto
-document.addEventListener('DOMContentLoaded', initAuth);// Função para gerar código pessoa
-function generatePersonCode() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = '';
-    for (let i = 0; i < 6; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return code;
-}
-
-// Verificar autenticação
-function checkAuth() {
-    const token = localStorage.getItem('token');
-    if (!token && !window.location.pathname.includes('index.html')) {
-        window.location.href = 'index.html';
-        return false;
-    }
-    return true;
-}
-
 // Função de login simulada
-async function login(email, password) {
-    // Simular chamada à API
+async function login(personCode, password) {
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Verificar no localStorage
+
+    // Busca usuários no localStorage
     const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const user = users.find(u => u.email === email && u.password === password);
-    
+    const user = users.find(u => u.personCode === personCode && u.password === password);
+
     if (!user) {
         throw new Error('Credenciais inválidas');
     }
-    
-    // Simular token
+
+    // Gera token falso e salva sessão
     const token = `fake-jwt-token-${Math.random().toString(36).substr(2)}`;
     localStorage.setItem('token', token);
     localStorage.setItem('currentUser', JSON.stringify(user));
-    
+
     return user;
 }
 
-// Função de logout
-function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('currentUser');
-    window.location.href = 'index.html';
+// Função para registrar novo usuário
+async function register(userData) {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    let users = JSON.parse(localStorage.getItem('users') || '[]');
+
+    // Verifica se código pessoa já existe
+    if (users.some(u => u.personCode === userData.personCode)) {
+        throw new Error('Código Pessoa já cadastrado');
+    }
+
+    users.push(userData);
+    localStorage.setItem('users', JSON.stringify(users));
+
+    // Cria token e salva sessão
+    const token = `fake-jwt-token-${Math.random().toString(36).substr(2)}`;
+    localStorage.setItem('token', token);
+    localStorage.setItem('currentUser', JSON.stringify(userData));
+
+    return userData;
 }
 
-// Exportar funções
+// Exporta funções
 export {
     generatePersonCode,
     checkAuth,
+    isAdmin,
+    setupLogout,
+    initAuth,
     login,
-    logout
+    register,
 };

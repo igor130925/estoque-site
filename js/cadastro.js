@@ -1,101 +1,83 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Gerar código aleatório de 6 dígitos
-    function generateRandomCode() {
-        const chars = '123456789';
-        let code = '';
-        for (let i = 0; i < 6; i++) {
-            code += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return code;
+document.addEventListener('DOMContentLoaded', function () {
+  // Função para gerar código aleatório 6 dígitos alfanuméricos
+  function generateRandomCode() {
+    const chars = '1234567890';  
+    
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
+    return code;
+  }
 
-    // Elementos do formulário
-    const registerForm = document.getElementById('registerForm');
-    const personCodeInput = document.getElementById('personCode');
-    const generateCodeBtn = document.getElementById('generateCode');
-    const errorMessage = document.getElementById('errorMessage');
+  const registerForm = document.getElementById('registerForm');
+  const personCodeInput = document.getElementById('personCode');
+  const generateCodeBtn = document.getElementById('generateCode');
+  const errorMessage = document.getElementById('errorMessage');
 
-    // Gerar código inicial
+  // Gera código inicial no input
+  personCodeInput.value = generateRandomCode();
+
+  // Gerar novo código ao clicar no botão
+  generateCodeBtn.addEventListener('click', function () {
     personCodeInput.value = generateRandomCode();
+  });
 
-    // Gerar novo código
-    generateCodeBtn.addEventListener('click', function() {
-        personCodeInput.value = generateRandomCode();
-    });
+  registerForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    errorMessage.textContent = '';
 
-    // Validar formulário
-    registerForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        errorMessage.textContent = '';
+    const name = document.getElementById('name').value.trim();
+    const personCode = personCodeInput.value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
 
-        // Obter valores
-        const name = document.getElementById('name').value.trim();
-        const personCode = personCodeInput.value;
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-
-        // Validações
-        if (!name || !email || !personCode || !password || !confirmPassword) {
-            errorMessage.textContent = 'Todos os campos são obrigatórios';
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            errorMessage.textContent = 'As senhas não coincidem';
-            return;
-        }
-
-        if (password.length < 6) {
-            errorMessage.textContent = 'A senha deve ter no mínimo 6 caracteres';
-            return;
-        }
-
-        if (!personCode.match(/^[A-Z0-9]{6}$/)) {
-            errorMessage.textContent = 'Código pessoa inválido';
-            return;
-        }
-
-        // Dados do usuário
-        const userData = {
-            name,
-            email,
-            personCode,
-            password,
-            role: 'user' // Padrão para usuários comuns
-        };
-
-        try {
-            // Chamada à API (simulada)
-            const response = await registerUser(userData);
-            
-            // Redirecionar após cadastro
-            window.location.href = 'produtos.html';
-            
-        } catch (error) {
-            console.error('Erro no cadastro:', error);
-            errorMessage.textContent = error.message || 'Erro ao cadastrar usuário';
-        }
-    });
-
-    // Função simulada de registro na API
-    async function registerUser(userData) {
-        // Simular delay da API
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Simular erro se e-mail já existe
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        if (users.some(u => u.email === userData.email)) {
-            throw new Error('E-mail já cadastrado');
-        }
-        
-        // Adicionar usuário
-        users.push(userData);
-        localStorage.setItem('users', JSON.stringify(users));
-        
-        // Simular resposta da API
-        return {
-            success: true,
-            user: userData
-        };
+    if (!name || !personCode || !password || !confirmPassword) {
+      errorMessage.textContent = 'Todos os campos são obrigatórios';
+      return;
     }
+
+    if (password !== confirmPassword) {
+      errorMessage.textContent = 'As senhas não coincidem';
+      return;
+    }
+
+    if (password.length < 6) {
+      errorMessage.textContent = 'A senha deve ter no mínimo 6 caracteres';
+      return;
+    }
+
+    if (!personCode.match(/^[A-Z0-9]{6}$/)) {
+      errorMessage.textContent = 'Código pessoa inválido';
+      return;
+    }
+
+    // Recupera usuários existentes ou inicia lista vazia
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+
+    // Verifica se código já existe
+    if (users.some((u) => u.personCode === personCode)) {
+      errorMessage.textContent = 'Código Pessoa já cadastrado';
+      return;
+    }
+
+    // Cria novo usuário com role padrão 'user'
+    const newUser = {
+      name,
+      personCode,
+      password,
+      role: 'user',
+    };
+
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+
+    // Simula criação de token e salva sessão
+    const fakeToken = 'token-' + Math.random().toString(36).substr(2);
+    localStorage.setItem('token', fakeToken);
+    localStorage.setItem('currentUser', JSON.stringify(newUser));
+
+    // Redireciona para página produtos
+    window.location.href = 'produtos.html';
+  });
 });
