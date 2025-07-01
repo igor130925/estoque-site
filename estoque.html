@@ -72,7 +72,7 @@
                             <th scope="col">Item</th>
                             <th scope="col">Categoria</th>
                             <th scope="col">Quantidade</th>
-                            <th scope="col">Validade</th> <!-- Nova coluna validade -->
+                            <th scope="col">Validade</th>
                             <th scope="col">Ações</th>
                         </tr>
                     </thead>
@@ -83,33 +83,40 @@
             </div>
         </section>
 
-        <!-- Modal de Retirada -->
-        <div id="modalRetirada" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalRetiradaTitle" aria-hidden="true" hidden>
+        <!-- Modal de Ações -->
+        <div id="modalAcoes" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalAcoesTitle" aria-hidden="true" hidden>
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 id="modalRetiradaTitle"><i class="fas fa-box" aria-hidden="true"></i> Registrar Retirada</h3>
+                    <h3 id="modalAcoesTitle"><i class="fas fa-tools"></i> Ações no Produto</h3>
                     <button class="close-btn" aria-label="Fechar modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <form id="formRetirada">
+                    <form id="formAcoes">
                         <input type="hidden" id="itemId" />
                         <div class="form-group">
-                            <label for="itemNome">Item:</label>
-                            <input type="text" id="itemNome" readonly />
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="quantidadeDisponivel">Disponível:</label>
-                                <input type="number" id="quantidadeDisponivel" readonly />
-                            </div>
-                            <div class="form-group">
-                                <label for="quantidadeRetirada">Quantidade a Retirar:</label>
-                                <input type="number" id="quantidadeRetirada" min="1" required />
-                            </div>
+                            <label for="itemNome">Nome do Produto:</label>
+                            <input type="text" id="itemNome" required />
                         </div>
                         <div class="form-group">
+                            <label for="quantidadeAtual">Quantidade Atual:</label>
+                            <input type="number" id="quantidadeAtual" readonly />
+                        </div>
+                        <div class="form-group">
+                            <label for="acaoTipo">Tipo de Ação:</label>
+                            <select id="acaoTipo" required>
+                                <option value="">Selecione</option>
+                                <option value="retirar">Retirar</option>
+                                <option value="adicionar">Adicionar</option>
+                                <option value="editar_nome">Editar Nome</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="quantidadeAcaoGrupo" style="display:none;">
+                            <label for="quantidadeAcao">Quantidade:</label>
+                            <input type="number" id="quantidadeAcao" min="1" />
+                        </div>
+                        <div class="form-group" id="responsavelGrupo" style="display:none;">
                             <label for="responsavel">Responsável:</label>
-                            <input type="text" id="responsavel" required />
+                            <input type="text" id="responsavel" />
                         </div>
                         <div class="form-group">
                             <label for="observacao">Observação:</label>
@@ -117,14 +124,18 @@
                         </div>
                         <div class="form-actions">
                             <button type="submit" class="btn primary">
-                                <i class="fas fa-check"></i> Confirmar Retirada
+                                <i class="fas fa-check"></i> Confirmar
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+
     </main>
+
+    <!-- Div para notificação -->
+    <div id="notification" class="notification" hidden></div>
 
     <script type="module" src="js/estoque.js"></script>
 </body>

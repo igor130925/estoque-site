@@ -140,3 +140,28 @@ body {
    background-color: #f0f0f0;
 
 }
+/* Notificação simples e elegante */
+.notification {
+    position: fixed;
+    top: 20px;       /* distância do topo */
+    left: 50%;       /* meio da tela horizontalmente */
+    transform: translateX(-50%) translateY(-20px);
+    background-color: #4BB543; /* verde sucesso */
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(75, 181, 67, 0.4);
+    font-weight: 600;
+    font-size: 1.1rem;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none; /* para não bloquear cliques */
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+

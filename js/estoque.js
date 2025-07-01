@@ -1,4 +1,3 @@
-// estoque.js
 import { getProducts, updateProduct } from './api.js';
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -17,9 +16,28 @@ document.addEventListener('DOMContentLoaded', async function() {
     const tabelaEstoque = document.getElementById('tabelaEstoque').getElementsByTagName('tbody')[0];
     const filtroBusca = document.getElementById('filtroBusca');
     const filtroCategoria = document.getElementById('filtroCategoria');
-    const modal = document.getElementById('modalRetirada');
-    const closeBtn = document.querySelector('.close-btn');
-    const formRetirada = document.getElementById('formRetirada');
+
+    const modalAcoes = document.getElementById('modalAcoes');
+    const closeBtnAcoes = modalAcoes.querySelector('.close-btn');
+    const formAcoes = document.getElementById('formAcoes');
+    const acaoTipo = document.getElementById('acaoTipo');
+    const quantidadeAcaoGrupo = document.getElementById('quantidadeAcaoGrupo');
+    const responsavelGrupo = document.getElementById('responsavelGrupo');
+
+    // Função para mostrar a notificação de sucesso
+    function mostrarMensagem(mensagem) {
+        const notification = document.getElementById('notification');
+        notification.textContent = mensagem;
+        notification.hidden = false;
+        notification.classList.add('show');
+
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.hidden = true;
+            }, 400);
+        }, 3000);
+    }
 
     // Carregar produtos do Supabase
     async function carregarEstoque() {
@@ -60,63 +78,96 @@ document.addEventListener('DOMContentLoaded', async function() {
                 <td>${item.quantidade}</td>
                 <td>${validadeFormatada}</td>
                 <td>
-                    <button class="btn primary btn-sm retirar-btn" data-id="${item.id}">
-                        <i class="fas fa-minus-circle"></i> Retirar
+                    <button class="btn primary btn-sm acoes-btn" data-id="${item.id}">
+                        <i class="fas fa-edit"></i> Ações
                     </button>
                 </td>
             `;
         });
 
-        document.querySelectorAll('.retirar-btn').forEach(btn => {
+        document.querySelectorAll('.acoes-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                abrirModalRetirada(this.dataset.id);
+                abrirModalAcoes(this.dataset.id);
             });
         });
     }
 
-    function abrirModalRetirada(itemId) {
+    function abrirModalAcoes(itemId) {
         const item = estoque.find(i => i.id == itemId);
         if (!item) return;
 
         document.getElementById('itemId').value = item.id;
         document.getElementById('itemNome').value = item.nome;
-        document.getElementById('quantidadeDisponivel').value = item.quantidade;
-        document.getElementById('quantidadeRetirada').max = item.quantidade;
-        document.getElementById('quantidadeRetirada').value = 1;
+        document.getElementById('quantidadeAtual').value = item.quantidade;
+        document.getElementById('quantidadeAcao').value = '';
         document.getElementById('responsavel').value = '';
         document.getElementById('observacao').value = '';
-        modal.style.display = 'block';
-        modal.removeAttribute('hidden');
+        acaoTipo.value = '';
+
+        quantidadeAcaoGrupo.style.display = 'none';
+        responsavelGrupo.style.display = 'none';
+
+        modalAcoes.style.display = 'flex';
+        modalAcoes.removeAttribute('hidden');
     }
 
-    closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-        modal.setAttribute('hidden', 'true');
+    closeBtnAcoes.addEventListener('click', () => {
+        modalAcoes.style.display = 'none';
+        modalAcoes.setAttribute('hidden', 'true');
     });
 
     window.addEventListener('click', e => {
-        if (e.target == modal) {
-            modal.style.display = 'none';
-            modal.setAttribute('hidden', 'true');
+        if (e.target == modalAcoes) {
+            modalAcoes.style.display = 'none';
+            modalAcoes.setAttribute('hidden', 'true');
         }
     });
 
-    formRetirada.addEventListener('submit', async e => {
+    // Mostrar/ocultar campos dependendo da ação selecionada
+    acaoTipo.addEventListener('change', () => {
+        const acao = acaoTipo.value;
+        if (acao === 'retirar' || acao === 'adicionar') {
+            quantidadeAcaoGrupo.style.display = 'block';
+            responsavelGrupo.style.display = 'block';
+            document.getElementById('quantidadeAcao').required = true;
+            document.getElementById('responsavel').required = true;
+        } else if (acao === 'editar_nome') {
+            quantidadeAcaoGrupo.style.display = 'none';
+            responsavelGrupo.style.display = 'none';
+            document.getElementById('quantidadeAcao').required = false;
+            document.getElementById('responsavel').required = false;
+        } else {
+            quantidadeAcaoGrupo.style.display = 'none';
+            responsavelGrupo.style.display = 'none';
+            document.getElementById('quantidadeAcao').required = false;
+            document.getElementById('responsavel').required = false;
+        }
+    });
+
+    formAcoes.addEventListener('submit', async e => {
         e.preventDefault();
+
         const id = document.getElementById('itemId').value;
-        const nome = document.getElementById('itemNome').value;
-        const disponivel = parseInt(document.getElementById('quantidadeDisponivel').value);
-        const retirada = parseInt(document.getElementById('quantidadeRetirada').value);
+        const nomeAtual = estoque.find(i => i.id == id)?.nome || '';
+        const nomeNovo = document.getElementById('itemNome').value.trim();
+        const quantidadeAtual = parseInt(document.getElementById('quantidadeAtual').value);
+        const acao = acaoTipo.value;
+        const quantidadeAcao = parseInt(document.getElementById('quantidadeAcao').value) || 0;
         const responsavel = document.getElementById('responsavel').value.trim();
         const observacao = document.getElementById('observacao').value.trim();
 
-        if (retirada <= 0 || retirada > disponivel) {
-            alert('Quantidade inválida para retirada.');
+        if (!acao) {
+            alert('Selecione o tipo de ação.');
             return;
         }
 
-        if (!responsavel) {
-            alert('Informe o responsável pela retirada.');
+        if ((acao === 'retirar' || acao === 'adicionar') && (quantidadeAcao <= 0)) {
+            alert('Informe uma quantidade válida.');
+            return;
+        }
+
+        if ((acao === 'retirar' || acao === 'adicionar') && !responsavel) {
+            alert('Informe o responsável.');
             return;
         }
 
@@ -124,30 +175,56 @@ document.addEventListener('DOMContentLoaded', async function() {
             const itemIndex = estoque.findIndex(i => i.id == id);
             if (itemIndex === -1) throw new Error('Produto não encontrado');
 
-            // Atualizar quantidade no Supabase
-            const novaQtd = estoque[itemIndex].quantidade - retirada;
-            await updateProduct(id, { quantidade: novaQtd });
+            let novaQtd = quantidadeAtual;
+            let atualizouNome = false;
 
-            // Atualiza localmente para refletir mudança
-            estoque[itemIndex].quantidade = novaQtd;
+            if (acao === 'retirar') {
+                if (quantidadeAcao > quantidadeAtual) {
+                    alert('Quantidade a retirar maior que a disponível.');
+                    return;
+                }
+                novaQtd = quantidadeAtual - quantidadeAcao;
+            } else if (acao === 'adicionar') {
+                novaQtd = quantidadeAtual + quantidadeAcao;
+            } else if (acao === 'editar_nome') {
+                if (nomeNovo === '') {
+                    alert('Nome do produto não pode ser vazio.');
+                    return;
+                }
+                estoque[itemIndex].nome = nomeNovo;
+                atualizouNome = true;
+            }
 
-            // Adicionar ao histórico
-            historicoRetiradas.push({
-                id,
-                nome,
-                quantidade: retirada,
-                responsavel,
-                observacao,
-                data: new Date().toLocaleString('pt-BR')
+            // Atualiza no banco Supabase (quantidade e/ou nome)
+            await updateProduct(id, {
+                quantidade: novaQtd,
+                nome: atualizouNome ? nomeNovo : undefined
             });
 
-            alert('Retirada realizada com sucesso!');
-            modal.style.display = 'none';
-            modal.setAttribute('hidden', 'true');
+            // Atualiza localmente
+            estoque[itemIndex].quantidade = novaQtd;
+            if (atualizouNome) estoque[itemIndex].nome = nomeNovo;
+
+            // Histórico de alterações para retirar/adicionar
+            if (acao === 'retirar' || acao === 'adicionar') {
+                historicoRetiradas.push({
+                    id,
+                    nome: estoque[itemIndex].nome,
+                    quantidade: acao === 'retirar' ? -quantidadeAcao : quantidadeAcao,
+                    responsavel,
+                    observacao,
+                    data: new Date().toLocaleString('pt-BR'),
+                    tipoAcao: acao
+                });
+            }
+
+            mostrarMensagem('Ação realizada com sucesso!');
+            modalAcoes.style.display = 'none';
+            modalAcoes.setAttribute('hidden', 'true');
             aplicarFiltros();
 
         } catch (error) {
-            alert('Erro ao registrar retirada: ' + error.message);
+            alert('Erro ao realizar a ação: ' + error.message);
         }
     });
 
