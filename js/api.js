@@ -3,45 +3,45 @@ import { supabase } from './supabaseClient.js';
 
 // Produtos
 
+// Busca todos os produtos
 export async function getProducts() {
     const { data, error } = await supabase
         .from('produtos')
         .select(`id, nome, tipo, quantidade, data_validade`)
         .order('nome', { ascending: true });
-
     if (error) throw error;
     return data;
 }
 
+// Cria um produto e registra movimentação "Criação"
 export async function createProduct(productData) {
-    // Primeiro, insere o produto
-    const { data: inserted, error } = await supabase
+    // Insere o produto
+    const { data, error } = await supabase
         .from('produtos')
         .insert([productData])
-        .select(); // pega o ID retornado
-
+        .select(); // para retornar o produto criado com id
     if (error) throw error;
 
-    const produtoCriado = inserted[0];
+    const produtoCriado = data[0];
 
-    // Agora, registra a movimentação de criação
-    const { error: movimentoError } = await supabase
+    // Registra movimentação do tipo "Criação"
+    const { error: errMov } = await supabase
         .from('movimentacoes')
         .insert([{
             data: new Date().toISOString(),
             produto_id: produtoCriado.id,
             tipo: 'Criação',
-            quantidade: produtoCriado.quantidade,
-            destino: 'Cadastro Inicial',
-            responsavel: 'Sistema',
-            motivo: 'Produto criado no sistema'
+            quantidade: produtoCriado.quantidade || 0,
+            destino: 'Estoque',
+            responsavel: productData.responsavel || 'ADM001',
+            motivo: 'Cadastro de novo produto'
         }]);
+    if (errMov) throw errMov;
 
-    if (movimentoError) throw movimentoError;
-
-    return inserted;
+    return data;
 }
 
+// Atualiza um produto
 export async function updateProduct(id, productData) {
     const { data, error } = await supabase
         .from('produtos')
@@ -51,6 +51,7 @@ export async function updateProduct(id, productData) {
     return data;
 }
 
+// Deleta um produto
 export async function deleteProduct(id) {
     const { error } = await supabase
         .from('produtos')
@@ -59,25 +60,28 @@ export async function deleteProduct(id) {
     if (error) throw error;
 }
 
+// Realoca produto e registra movimentação "Realocação"
 export async function relocateProduct(productId, data) {
+    // Obtém produto atual
     const { data: produto, error } = await supabase
         .from('produtos')
         .select('*')
         .eq('id', productId)
         .single();
-
     if (error) throw error;
 
+    // Calcula nova quantidade
     const novaQuantidade = produto.quantidade - data.quantity;
     if (novaQuantidade < 0) throw new Error('Quantidade insuficiente para realocação');
 
+    // Atualiza quantidade
     const { error: errUpdate } = await supabase
         .from('produtos')
         .update({ quantidade: novaQuantidade })
         .eq('id', productId);
-
     if (errUpdate) throw errUpdate;
 
+    // Registra movimentação
     const { error: errMov } = await supabase
         .from('movimentacoes')
         .insert([{
@@ -89,20 +93,20 @@ export async function relocateProduct(productId, data) {
             responsavel: data.responsavel || 'ADM001',
             motivo: data.reason || ''
         }]);
-
     if (errMov) throw errMov;
 
     return true;
 }
 
-// Estatísticas do sistema
+// Obtém estatísticas do sistema
 export async function getSystemStats() {
     const { count: totalProducts, error: err1 } = await supabase
         .from('produtos')
         .select('*', { count: 'exact', head: true });
     if (err1) throw err1;
 
-    const totalUsers = 10; // valor fixo como exemplo
+    // Pode ajustar para pegar número real de usuários
+    const totalUsers = 10;
 
     const { count: lowStockProducts, error: err2 } = await supabase
         .from('produtos')
@@ -113,7 +117,7 @@ export async function getSystemStats() {
     return { totalProducts, totalUsers, lowStockProducts };
 }
 
-// Movimentações
+// Busca movimentações com dados do produto relacionados
 export async function getMovements() {
     const { data, error } = await supabase
         .from('movimentacoes')
@@ -128,7 +132,29 @@ export async function getMovements() {
         `)
         .order('data', { ascending: false })
         .limit(20);
-
     if (error) throw error;
     return data;
+}
+
+// Função para registrar movimentações genéricas (exemplo)
+export async function registrarMovimentacao(tipo, pagina, itemId, detalhes) {
+    try {
+        // Ajuste aqui para pegar o usuário correto
+        const usuario = supabase.auth.user()?.email || 'Sistema';
+        
+        const { data, error } = await supabase
+            .from('movimentacoes')
+            .insert([{
+                usuario: usuario,
+                tipo: tipo,
+                pagina: pagina,
+                item_id: itemId,
+                detalhes: detalhes,
+                data_hora: new Date().toISOString()
+            }]);
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Erro ao registrar movimentação:', error);
+    }
 }

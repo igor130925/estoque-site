@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro de Movimentações</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+  <header class="top-nav">
+    <div class="nav-container">
+      <h1 class="logo">Controle de Movimentações</h1>
+      <nav class="desktop-nav">
+        <ul>
+          <li><a href="produtos.html"><i class="fas fa-box"></i> Produtos</a></li>
+          <li><a href="estoque.html"><i class="fas fa-warehouse"></i> Estoque</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="filtros">
+      <form id="filtro-form" onsubmit="return false;">
+        <div class="form-group">
+          <label for="data-inicio">Data Início:</label>
+          <input type="date" id="data-inicio" />
+        </div>
+        <div class="form-group">
+          <label for="data-fim">Data Fim:</label>
+          <input type="date" id="data-fim" />
+        </div>
+        <div class="form-group">
+          <label for="tipo">Tipo:</label>
+          <select id="tipo">
+            <option value="todos">Todos</option>
+            <option value="Criação">Criação</option>
+            <option value="Realocação">Realocação</option>
+            <option value="Adição">Adição</option>
+            <option value="Retirada">Retirada</option>
+            <option value="Edição">Edição</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="busca-texto">Buscar:</label>
+          <input type="text" id="busca-texto" placeholder="Buscar por produto, motivo, responsável..." />
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn primary" id="btn-filtrar" aria-label="Filtrar movimentações">Filtrar</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="movimentacoes">
+      <h2>Histórico de Movimentações</h2>
+      <div class="table-responsive">
+        <table class="movements-table">
+          <thead>
+            <tr>
+              <th scope="col">Data/Hora</th>
+              <th scope="col">Produto</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Quantidade</th>
+              <th scope="col">Destino</th>
+              <th scope="col">Responsável</th>
+              <th scope="col">Motivo</th>
+            </tr>
+          </thead>
+          <tbody id="corpo-tabela">
+            <!-- Dados preenchidos via JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="js/movimentacao.js"></script>
+</body>
+</html>
