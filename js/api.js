@@ -6,20 +6,40 @@ import { supabase } from './supabaseClient.js';
 export async function getProducts() {
     const { data, error } = await supabase
         .from('produtos')
-        .select(`id, nome, tipo, quantidade, data_validade`) // selecione só os campos que usa
+        .select(`id, nome, tipo, quantidade, data_validade`)
         .order('nome', { ascending: true });
+
     if (error) throw error;
     return data;
 }
 
-// restante do código permanece igual...
-
 export async function createProduct(productData) {
-    const { data, error } = await supabase
+    // Primeiro, insere o produto
+    const { data: inserted, error } = await supabase
         .from('produtos')
-        .insert([productData]);
+        .insert([productData])
+        .select(); // pega o ID retornado
+
     if (error) throw error;
-    return data;
+
+    const produtoCriado = inserted[0];
+
+    // Agora, registra a movimentação de criação
+    const { error: movimentoError } = await supabase
+        .from('movimentacoes')
+        .insert([{
+            data: new Date().toISOString(),
+            produto_id: produtoCriado.id,
+            tipo: 'Criação',
+            quantidade: produtoCriado.quantidade,
+            destino: 'Cadastro Inicial',
+            responsavel: 'Sistema',
+            motivo: 'Produto criado no sistema'
+        }]);
+
+    if (movimentoError) throw movimentoError;
+
+    return inserted;
 }
 
 export async function updateProduct(id, productData) {
@@ -39,14 +59,13 @@ export async function deleteProduct(id) {
     if (error) throw error;
 }
 
-// Outras funções continuam iguais...
-
 export async function relocateProduct(productId, data) {
     const { data: produto, error } = await supabase
         .from('produtos')
         .select('*')
         .eq('id', productId)
         .single();
+
     if (error) throw error;
 
     const novaQuantidade = produto.quantidade - data.quantity;
@@ -56,6 +75,7 @@ export async function relocateProduct(productId, data) {
         .from('produtos')
         .update({ quantidade: novaQuantidade })
         .eq('id', productId);
+
     if (errUpdate) throw errUpdate;
 
     const { error: errMov } = await supabase
@@ -69,18 +89,20 @@ export async function relocateProduct(productId, data) {
             responsavel: data.responsavel || 'ADM001',
             motivo: data.reason || ''
         }]);
+
     if (errMov) throw errMov;
 
     return true;
 }
 
+// Estatísticas do sistema
 export async function getSystemStats() {
     const { count: totalProducts, error: err1 } = await supabase
         .from('produtos')
         .select('*', { count: 'exact', head: true });
     if (err1) throw err1;
 
-    const totalUsers = 10;
+    const totalUsers = 10; // valor fixo como exemplo
 
     const { count: lowStockProducts, error: err2 } = await supabase
         .from('produtos')
@@ -91,6 +113,7 @@ export async function getSystemStats() {
     return { totalProducts, totalUsers, lowStockProducts };
 }
 
+// Movimentações
 export async function getMovements() {
     const { data, error } = await supabase
         .from('movimentacoes')
@@ -105,6 +128,7 @@ export async function getMovements() {
         `)
         .order('data', { ascending: false })
         .limit(20);
+
     if (error) throw error;
     return data;
 }
