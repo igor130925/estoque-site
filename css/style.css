@@ -7,7 +7,7 @@
     --info: #4895ef;
     --light: #f8f9fa;
     --dark: #212529;
-    --white: #ffffff;
+    --white: #fafafa; /* Cinza muito claro no lugar do branco */
     --gray: #6c757d;
 }
 
@@ -19,11 +19,13 @@
 }
 
 body {
-    background-color: #0c5bd1; /* Mantive esta cor, pois tinha as duas */
+    background-color: #f0f0f0; /* cinza claro igual ao estoque.css */
     color: var(--dark);
     margin: 0;
     padding: 0;
 }
+
+
 
 .container {
     width: 100%;
@@ -366,4 +368,5 @@ body {
     .success-message {
         width: 80%;
     }
+    
 }
