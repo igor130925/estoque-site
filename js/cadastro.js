@@ -1,8 +1,8 @@
-import { supabase } from '../supabaseClient.js'; // ajuste o caminho conforme seu projeto
+import { supabase } from './supabaseClient.js';
 
-// Função para gerar código pessoa único (6 caracteres)
+// Função para gerar código pessoa único
 async function generateUniquePersonCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const chars = '0123456789'; // só números agora
   let code;
   let exists = true;
 
@@ -11,34 +11,43 @@ async function generateUniquePersonCode() {
     for (let i = 0; i < 6; i++) {
       code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    console.log('Código gerado:', code);
 
     const { data, error } = await supabase
       .from('usuarios')
-      .select('personCode')
-      .eq('personCode', code)
-      .single();
+      .select('personcode')
+      .eq('personcode', code)
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') {
-      // PGRST116 = Not found (tudo bem se não encontrar)
-      console.error('Erro ao consultar código no banco:', error);
+    if (error && ![406, 404].includes(error.status)) {
+      console.error('Erro ao verificar código:', error);
       throw error;
     }
 
-    exists = !!data; // se data existe, código já está em uso, repete
+    exists = !!data;
   }
+
   return code;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   const generateBtn = document.getElementById('generateCode');
-  const personCodeInput = document.getElementById('personCode');
+  const personCodeInput = document.getElementById('personcode');
   const errorMessage = document.getElementById('errorMessage');
 
+  // Gera automaticamente ao carregar
+  (async () => {
+    try {
+      const code = await generateUniquePersonCode();
+      personCodeInput.value = code;
+    } catch (err) {
+      console.error('Erro ao gerar código inicial:', err);
+    }
+  })();
+
+  // Botão de gerar novo código
   generateBtn.addEventListener('click', async () => {
     generateBtn.disabled = true;
     generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
-
     try {
       const code = await generateUniquePersonCode();
       personCodeInput.value = code;
@@ -51,43 +60,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Aqui você pode adicionar o submit do formulário para cadastrar no Supabase, se quiser
-  // Exemplo simples:
+  // Submissão do formulário
   const registerForm = document.getElementById('registerForm');
-  registerForm.addEventListener('submit', async e => {
+  registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const name = document.getElementById('name').value.trim();
-    const personCode = personCodeInput.value.trim();
+    const personcode = personCodeInput.value.trim();
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
 
-    if (!name || !personCode || !password || !confirmPassword) {
-      errorMessage.textContent = 'Preencha todos os campos.';
+    if (!name || !personcode || !password || !confirmPassword) {
+      errorMessage.textContent = 'Todos os campos são obrigatórios';
       return;
     }
 
     if (password.length < 6) {
-      errorMessage.textContent = 'Senha deve ter no mínimo 6 caracteres.';
+      errorMessage.textContent = 'Senha deve ter no mínimo 6 caracteres';
       return;
     }
 
     if (password !== confirmPassword) {
-      errorMessage.textContent = 'Senhas não conferem.';
+      errorMessage.textContent = 'Senhas não conferem';
       return;
     }
 
-    // Tenta cadastrar no Supabase
-    const { data, error } = await supabase.from('usuarios').insert([
-      { name, personCode, password, role: 'user' } // ajuste os campos conforme seu banco
-    ]);
+    try {
+      // Salvar senha diretamente, sem hash
+      const { error } = await supabase.from('usuarios').insert([
+        { name, personcode, password, role: 'user' },
+      ]);
 
-    if (error) {
-      errorMessage.textContent = 'Erro ao cadastrar: ' + error.message;
-      return;
+      if (error) {
+        throw error;
+      }
+
+      alert('Cadastro realizado com sucesso!');
+      window.location.href = 'index.html';
+    } catch (err) {
+      errorMessage.textContent = 'Erro ao cadastrar: ' + err.message;
     }
-
-    alert('Cadastro realizado com sucesso!');
-    window.location.href = 'index.html'; // redireciona para login
   });
 });
