@@ -2,7 +2,7 @@ import { supabase } from './supabaseClient.js';
 
 // Função para gerar código pessoa único
 async function generateUniquePersonCode() {
-  const chars = '0123456789'; // só números agora
+  const chars = '0123456789';
   let code;
   let exists = true;
 
@@ -34,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const personCodeInput = document.getElementById('personcode');
   const errorMessage = document.getElementById('errorMessage');
 
-  // Gera automaticamente ao carregar
   (async () => {
     try {
       const code = await generateUniquePersonCode();
@@ -44,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   })();
 
-  // Botão de gerar novo código
   generateBtn.addEventListener('click', async () => {
     generateBtn.disabled = true;
     generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
@@ -60,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Submissão do formulário
   const registerForm = document.getElementById('registerForm');
   registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -86,17 +83,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      // Salvar senha diretamente, sem hash
       const { error } = await supabase.from('usuarios').insert([
         { name, personcode, password, role: 'user' },
       ]);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
-      alert('Cadastro realizado com sucesso!');
-      window.location.href = 'index.html';
+      // Salvar usuário no localStorage
+      localStorage.setItem('currentUser', JSON.stringify({ name, personcode }));
+
+      // Redirecionar para a tela de estoque
+      window.location.href = 'estoque.html';
     } catch (err) {
       errorMessage.textContent = 'Erro ao cadastrar: ' + err.message;
     }

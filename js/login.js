@@ -1,6 +1,4 @@
-// login.js
 import { supabase } from './supabaseClient.js';
-
 
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('loginForm');
@@ -32,11 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Salva usuário logado
+      // Salvar usuário no localStorage
       localStorage.setItem('currentUser', JSON.stringify(user));
 
-      // Redireciona para página principal
-      window.location.href = 'index.html';
+      // Redirecionar para o painel de estoque
+      window.location.href = 'estoque.html';
     } catch (err) {
       console.error(err);
       errorLogin.textContent = 'Erro ao fazer login.';
