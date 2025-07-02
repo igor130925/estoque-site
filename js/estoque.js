@@ -1,4 +1,3 @@
-// js/estoque.js
 import { getProducts, updateProduct, registrarMovimentacaoDetalhada } from './api.js';
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -102,6 +101,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         quantidadeAcaoGrupo.style.display = 'none';
         responsavelGrupo.style.display = 'none';
 
+        // DESABILITA o campo nome por padrão
+        document.getElementById('itemNome').disabled = true;
+
         modalAcoes.style.display = 'flex';
         modalAcoes.removeAttribute('hidden');
     }
@@ -121,21 +123,33 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Mostrar/ocultar campos dependendo da ação selecionada
     acaoTipo.addEventListener('change', () => {
         const acao = acaoTipo.value;
+
         if (acao === 'retirar' || acao === 'adicionar') {
             quantidadeAcaoGrupo.style.display = 'block';
             responsavelGrupo.style.display = 'block';
             document.getElementById('quantidadeAcao').required = true;
             document.getElementById('responsavel').required = true;
+
+            // DESABILITA nome para outras ações
+            document.getElementById('itemNome').disabled = true;
+
         } else if (acao === 'editar_nome') {
             quantidadeAcaoGrupo.style.display = 'none';
             responsavelGrupo.style.display = 'none';
             document.getElementById('quantidadeAcao').required = false;
             document.getElementById('responsavel').required = false;
+
+            // HABILITA o campo nome para edição
+            document.getElementById('itemNome').disabled = false;
+
         } else {
             quantidadeAcaoGrupo.style.display = 'none';
             responsavelGrupo.style.display = 'none';
             document.getElementById('quantidadeAcao').required = false;
             document.getElementById('responsavel').required = false;
+
+            // DESABILITA o campo nome para outras ações
+            document.getElementById('itemNome').disabled = true;
         }
     });
 
