@@ -1,5 +1,107 @@
 import { getProducts, updateProduct, registrarMovimentacaoDetalhada } from './api.js';
 
+// Criar modal galeria imagens no body (com botões)
+const modalGaleria = document.createElement('div');
+modalGaleria.id = 'modalGaleria';
+modalGaleria.style.cssText = `
+    display:none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+`;
+modalGaleria.innerHTML = `
+    <div class="modal-content" style="position:relative; max-width:90vw; max-height:90vh; display:flex; align-items:center; justify-content:center;">
+        <button id="btnCloseGaleria" title="Fechar" style="
+            position:absolute; top:10px; right:10px;
+            background:rgba(255,255,255,0.7);
+            border:none; border-radius:50%;
+            width:35px; height:35px;
+            font-size:1.2rem;
+            cursor:pointer;
+            z-index:10;
+        ">&times;</button>
+        <button id="btnPrevGaleria" title="Anterior" style="
+            position:absolute; left:10px; top:50%;
+            transform: translateY(-50%);
+            background:rgba(255,255,255,0.7);
+            border:none; border-radius:50%;
+            width:40px; height:40px;
+            font-size:1.5rem;
+            cursor:pointer;
+            z-index:10;
+        ">&#8592;</button>
+        <img id="imgGaleria" src="" alt="" style="max-width:100%; max-height:80vh; border-radius:8px; box-shadow:0 0 20px rgba(255,255,255,0.7); user-select:none;" />
+        <button id="btnNextGaleria" title="Próximo" style="
+            position:absolute; right:10px; top:50%;
+            transform: translateY(-50%);
+            background:rgba(255,255,255,0.7);
+            border:none; border-radius:50%;
+            width:40px; height:40px;
+            font-size:1.5rem;
+            cursor:pointer;
+            z-index:10;
+        ">&#8594;</button>
+    </div>
+`;
+document.body.appendChild(modalGaleria);
+
+const btnCloseGaleria = document.getElementById('btnCloseGaleria');
+const btnPrevGaleria = document.getElementById('btnPrevGaleria');
+const btnNextGaleria = document.getElementById('btnNextGaleria');
+const imgGaleria = document.getElementById('imgGaleria');
+
+let imagensAtual = [];
+let indiceImagemAtual = 0;
+
+btnCloseGaleria.addEventListener('click', () => {
+    modalGaleria.style.display = 'none';
+    imgGaleria.src = '';
+});
+
+btnPrevGaleria.addEventListener('click', e => {
+    e.stopPropagation();
+    indiceImagemAtual = (indiceImagemAtual - 1 + imagensAtual.length) % imagensAtual.length;
+    mostrarImagemGaleria();
+});
+
+btnNextGaleria.addEventListener('click', e => {
+    e.stopPropagation();
+    indiceImagemAtual = (indiceImagemAtual + 1) % imagensAtual.length;
+    mostrarImagemGaleria();
+});
+
+modalGaleria.addEventListener('click', e => {
+    // Fecha modal se clicar fora da imagem (no fundo)
+    if (e.target === modalGaleria) {
+        modalGaleria.style.display = 'none';
+        imgGaleria.src = '';
+    }
+});
+
+function mostrarImagemGaleria() {
+    imgGaleria.src = imagensAtual[indiceImagemAtual];
+    imgGaleria.alt = `Imagem ${indiceImagemAtual + 1} de ${imagensAtual.length}`;
+
+    // Se só tiver 1 imagem, oculta os botões de navegação
+    const mostrarBotoes = imagensAtual.length > 1;
+    btnPrevGaleria.style.display = mostrarBotoes ? 'block' : 'none';
+    btnNextGaleria.style.display = mostrarBotoes ? 'block' : 'none';
+}
+
+function abrirModalGaleria(imagens) {
+    if (!imagens || imagens.length === 0) return;
+    imagensAtual = imagens.slice(0,4); // até 4 imagens
+    indiceImagemAtual = 0;
+    mostrarImagemGaleria();
+    modalGaleria.style.display = 'flex';
+}
+
 document.addEventListener('DOMContentLoaded', async function() {
     // Verificar autenticação
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -23,7 +125,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const quantidadeAcaoGrupo = document.getElementById('quantidadeAcaoGrupo');
     const responsavelGrupo = document.getElementById('responsavelGrupo');
 
-    // Função para mostrar a notificação de sucesso
+    // Funções de notificação (igual seu código)
     function mostrarMensagem(mensagem) {
         const notification = document.getElementById('notification');
         notification.textContent = mensagem;
@@ -41,7 +143,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         }, 3000);
     }
 
-    // Função para mostrar notificação de erro
     function mostrarErro(mensagem) {
         const notification = document.getElementById('notification');
         notification.textContent = mensagem;
@@ -59,7 +160,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         }, 4000);
     }
 
-    // Carregar produtos do Supabase
     async function carregarEstoque() {
         try {
             estoque = await getProducts();
@@ -70,7 +170,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
 
-    // Aplica filtros e atualiza tabela
     function aplicarFiltros() {
         const filtroTexto = filtroBusca.value.toLowerCase();
         const filtroCat = filtroCategoria.value;
@@ -86,14 +185,18 @@ document.addEventListener('DOMContentLoaded', async function() {
             const icon = getCategoryIcon(item.tipo);
             const validadeFormatada = item.data_validade ? new Date(item.data_validade).toLocaleDateString('pt-BR') : '-';
 
-            // Adicione a coluna de imagem; suponho que a propriedade seja item.imagem (url)
-            // Caso o campo seja diferente, substitua abaixo
-            const imagemURL = item.imagem || ''; // URL da imagem ou string vazia
+            // Pega até 4 imagens para o produto
+            const imagens = (item.imagem_url && item.imagem_url.length > 0) ? item.imagem_url.slice(0,4) : [];
+
+            // Exibe só a primeira imagem como thumbnail, clicável para abrir o modal
+            const primeiraImagem = imagens[0] || '';
 
             row.innerHTML = `
                 <td>${item.id}</td>
                 <td>
-                    ${imagemURL ? `<img src="${imagemURL}" alt="${item.nome}" style="width:50px; height:50px; object-fit: cover; border-radius: 4px;">` : '-'}
+                    ${primeiraImagem
+                        ? `<img src="${primeiraImagem}" alt="${item.nome}" class="img-thumb" style="width:100px; height:100px; object-fit: cover; border-radius: 6px; cursor:pointer;">`
+                        : '-'}
                 </td>
                 <td>${item.nome}</td>
                 <td><span class="category">${icon} ${formatCategory(item.tipo)}</span></td>
@@ -105,6 +208,12 @@ document.addEventListener('DOMContentLoaded', async function() {
                     </button>
                 </td>
             `;
+
+            // Adiciona evento para abrir modal galeria na imagem
+            if (primeiraImagem) {
+                const imgElement = row.querySelector('img.img-thumb');
+                imgElement.addEventListener('click', () => abrirModalGaleria(imagens));
+            }
         });
 
         document.querySelectorAll('.acoes-btn').forEach(btn => {
@@ -129,7 +238,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         quantidadeAcaoGrupo.style.display = 'none';
         responsavelGrupo.style.display = 'none';
 
-        // DESABILITA o campo nome por padrão
         document.getElementById('itemNome').disabled = true;
 
         modalAcoes.style.display = 'flex';
@@ -148,7 +256,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
 
-    // Mostrar/ocultar campos dependendo da ação selecionada
     acaoTipo.addEventListener('change', () => {
         const acao = acaoTipo.value;
 
@@ -157,26 +264,18 @@ document.addEventListener('DOMContentLoaded', async function() {
             responsavelGrupo.style.display = 'block';
             document.getElementById('quantidadeAcao').required = true;
             document.getElementById('responsavel').required = true;
-
-            // DESABILITA nome para outras ações
             document.getElementById('itemNome').disabled = true;
-
         } else if (acao === 'editar_nome') {
             quantidadeAcaoGrupo.style.display = 'none';
             responsavelGrupo.style.display = 'none';
             document.getElementById('quantidadeAcao').required = false;
             document.getElementById('responsavel').required = false;
-
-            // HABILITA o campo nome para edição
             document.getElementById('itemNome').disabled = false;
-
         } else {
             quantidadeAcaoGrupo.style.display = 'none';
             responsavelGrupo.style.display = 'none';
             document.getElementById('quantidadeAcao').required = false;
             document.getElementById('responsavel').required = false;
-
-            // DESABILITA o campo nome para outras ações
             document.getElementById('itemNome').disabled = true;
         }
     });
@@ -233,17 +332,14 @@ document.addEventListener('DOMContentLoaded', async function() {
                 atualizouNome = true;
             }
 
-            // Atualiza no banco Supabase (quantidade e/ou nome)
             await updateProduct(id, {
                 quantidade: novaQtd,
                 nome: atualizouNome ? nomeNovo : undefined
             });
 
-            // Atualiza localmente
             estoque[itemIndex].quantidade = novaQtd;
             if (atualizouNome) estoque[itemIndex].nome = nomeNovo;
 
-            // Registrar movimentação detalhada no Supabase
             if (acao === 'retirar' || acao === 'adicionar') {
                 const tipoMov = acao === 'retirar' ? 'Retirada' : 'Adição';
                 const motivoMov = observacao || `${tipoMov} de ${quantidadeAcao} unidades`;

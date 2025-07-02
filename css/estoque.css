@@ -196,4 +196,71 @@ body {
 .notification.error {
     background-color: #e74c3c;
 }
+/* Modal para galeria de imagens */
+#modalGaleria {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+}
+
+#modalGaleria .modal-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#modalGaleria img {
+    max-width: 100%;
+    max-height: 80vh;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.7);
+    user-select: none;
+}
+
+#modalGaleria button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255,255,255,0.7);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s ease;
+}
+
+#modalGaleria button:hover {
+    background-color: rgba(255,255,255,0.9);
+}
+
+#btnPrev {
+    left: 10px;
+}
+
+#btnNext {
+    right: 10px;
+}
+
+#btnClose {
+    top: 10px;
+    right: 10px;
+    transform: none;
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
+}
 
