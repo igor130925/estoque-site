@@ -1,53 +1,31 @@
+// js/movimentacao.js
 import { getMovements } from './api.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  await carregarMovimentacoes();
+  const inputBusca = document.getElementById('busca-texto');
+  inputBusca.addEventListener('input', carregarMovimentacoes);
 
-  document.getElementById('btn-filtrar').addEventListener('click', carregarMovimentacoes);
+  await carregarMovimentacoes(); // Carrega inicialmente
 });
 
 async function carregarMovimentacoes() {
   try {
     const movimentos = await getMovements();
 
-    // Pegando valores dos filtros
-    const dataInicioStr = document.getElementById('data-inicio').value;
-    const dataFimStr = document.getElementById('data-fim').value;
-    const tipoFiltro = document.getElementById('tipo').value;
     const buscaTexto = document.getElementById('busca-texto').value.toLowerCase();
 
-    // Converter strings de data para objetos Date (se preenchidos)
-    const dataInicio = dataInicioStr ? new Date(dataInicioStr) : null;
-    const dataFim = dataFimStr ? new Date(dataFimStr) : null;
-
-    // Filtrar os movimentos de acordo com os filtros da UI
     const filtrados = movimentos.filter(mov => {
-      // Filtra pelo tipo escolhido, se "todos" filtra só Edição
-      if (tipoFiltro === 'todos' && mov.tipo !== 'Edição') return false;
-      if (tipoFiltro !== 'todos' && mov.tipo !== tipoFiltro) return false;
+      const nomeProduto = mov.produtos?.nome?.toLowerCase() || '';
+      const motivo = mov.motivo?.toLowerCase() || '';
+      const responsavel = mov.responsavel?.toLowerCase() || '';
+      const destino = mov.destino?.toLowerCase() || '';
 
-      // Filtra por data início e fim
-      if (dataInicio || dataFim) {
-        const dataMov = mov.data ? new Date(mov.data) : null;
-        if (!dataMov) return false;
-        if (dataInicio && dataMov < dataInicio) return false;
-        if (dataFim && dataMov > dataFim) return false;
-      }
-
-      // Filtrar por busca de texto em vários campos
-      if (buscaTexto) {
-        const nomeProduto = mov.produtos?.nome?.toLowerCase() || '';
-        const motivo = mov.motivo?.toLowerCase() || '';
-        const responsavel = mov.responsavel?.toLowerCase() || '';
-        const destino = mov.destino?.toLowerCase() || '';
-
-        if (
-          !nomeProduto.includes(buscaTexto) &&
-          !motivo.includes(buscaTexto) &&
-          !responsavel.includes(buscaTexto) &&
-          !destino.includes(buscaTexto)
-        ) return false;
-      }
+      if (
+        !nomeProduto.includes(buscaTexto) &&
+        !motivo.includes(buscaTexto) &&
+        !responsavel.includes(buscaTexto) &&
+        !destino.includes(buscaTexto)
+      ) return false;
 
       return true;
     });

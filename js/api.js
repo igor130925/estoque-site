@@ -136,11 +136,25 @@ export async function getMovements() {
     return data;
 }
 
-// Função para registrar movimentações genéricas (exemplo)
+// Função para registrar movimentação detalhada (exemplo: usada no cadastro, retirada, adição)
+export async function registrarMovimentacaoDetalhada(movimentacao) {
+    try {
+        const { data, error } = await supabase
+            .from('movimentacoes')
+            .insert([movimentacao]);
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Erro ao registrar movimentação:', error);
+        throw error;
+    }
+}
+
+// Função genérica para registrar movimentação simples (pode manter ou remover)
 export async function registrarMovimentacao(tipo, pagina, itemId, detalhes) {
     try {
-        // Ajuste aqui para pegar o usuário correto
-        const usuario = supabase.auth.user()?.email || 'Sistema';
+        // Ajuste aqui para pegar o usuário correto, exemplo usando localStorage
+        const usuario = JSON.parse(localStorage.getItem('currentUser'))?.email || 'Sistema';
         
         const { data, error } = await supabase
             .from('movimentacoes')

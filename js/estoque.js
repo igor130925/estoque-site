@@ -1,4 +1,5 @@
-import { getProducts, updateProduct } from './api.js';
+// js/estoque.js
+import { getProducts, updateProduct, registrarMovimentacaoDetalhada } from './api.js';
 
 document.addEventListener('DOMContentLoaded', async function() {
     // Verificar autenticação
@@ -11,7 +12,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('currentUser').textContent = currentUser.name;
 
     let estoque = [];
-    let historicoRetiradas = [];
 
     const tabelaEstoque = document.getElementById('tabelaEstoque').getElementsByTagName('tbody')[0];
     const filtroBusca = document.getElementById('filtroBusca');
@@ -43,11 +43,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     async function carregarEstoque() {
         try {
             estoque = await getProducts();
-            console.log('Produtos carregados:', estoque);
-
-            if (!Array.isArray(estoque) || estoque.length === 0) {
-                console.warn('Nenhum produto encontrado no estoque');
-            }
             aplicarFiltros();
         } catch (error) {
             alert('Erro ao carregar estoque: ' + error.message);
@@ -205,16 +200,29 @@ document.addEventListener('DOMContentLoaded', async function() {
             estoque[itemIndex].quantidade = novaQtd;
             if (atualizouNome) estoque[itemIndex].nome = nomeNovo;
 
-            // Histórico de alterações para retirar/adicionar
+            // Registrar movimentação detalhada no Supabase
             if (acao === 'retirar' || acao === 'adicionar') {
-                historicoRetiradas.push({
-                    id,
-                    nome: estoque[itemIndex].nome,
-                    quantidade: acao === 'retirar' ? -quantidadeAcao : quantidadeAcao,
-                    responsavel,
-                    observacao,
-                    data: new Date().toLocaleString('pt-BR'),
-                    tipoAcao: acao
+                const tipoMov = acao === 'retirar' ? 'Retirada' : 'Adição';
+                const motivoMov = observacao || `${tipoMov} de ${quantidadeAcao} unidades`;
+
+                await registrarMovimentacaoDetalhada({
+                    data: new Date().toISOString(),
+                    produto_id: id,
+                    tipo: tipoMov,
+                    quantidade: quantidadeAcao,
+                    destino: 'Estoque',
+                    responsavel: responsavel,
+                    motivo: motivoMov
+                });
+            } else if (acao === 'editar_nome') {
+                await registrarMovimentacaoDetalhada({
+                    data: new Date().toISOString(),
+                    produto_id: id,
+                    tipo: 'Edição de nome',
+                    quantidade: 0,
+                    destino: 'Estoque',
+                    responsavel: responsavel,
+                    motivo: `Nome alterado de "${nomeAtual}" para "${nomeNovo}" - Observação: ${observacao}`
                 });
             }
 
@@ -255,10 +263,3 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     await carregarEstoque();
 });
-// Após uma operação bem-sucedida no estoque
-await registrarMovimentacao(
-    'entrada_estoque', 
-    'estoque.html', 
-    itemId, 
-    `Adicionado ${quantidade} unidades do item ${itemNome}`
-);
