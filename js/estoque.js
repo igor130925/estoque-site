@@ -28,14 +28,35 @@ document.addEventListener('DOMContentLoaded', async function() {
         const notification = document.getElementById('notification');
         notification.textContent = mensagem;
         notification.hidden = false;
+        notification.classList.remove('error');
         notification.classList.add('show');
+        notification.classList.add('success');
 
         setTimeout(() => {
             notification.classList.remove('show');
+            notification.classList.remove('success');
             setTimeout(() => {
                 notification.hidden = true;
             }, 400);
         }, 3000);
+    }
+
+    // Função para mostrar notificação de erro
+    function mostrarErro(mensagem) {
+        const notification = document.getElementById('notification');
+        notification.textContent = mensagem;
+        notification.hidden = false;
+        notification.classList.remove('success');
+        notification.classList.add('show');
+        notification.classList.add('error');
+
+        setTimeout(() => {
+            notification.classList.remove('show');
+            notification.classList.remove('error');
+            setTimeout(() => {
+                notification.hidden = true;
+            }, 400);
+        }, 4000);
     }
 
     // Carregar produtos do Supabase
@@ -180,6 +201,11 @@ document.addEventListener('DOMContentLoaded', async function() {
             return;
         }
 
+        if (acao === 'retirar' && quantidadeAcao > quantidadeAtual) {
+            mostrarErro(`Erro: você tentou retirar ${quantidadeAcao} unidades, mas só tem ${quantidadeAtual} em estoque.`);
+            return;
+        }
+
         try {
             const itemIndex = estoque.findIndex(i => i.id == id);
             if (itemIndex === -1) throw new Error('Produto não encontrado');
@@ -188,10 +214,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             let atualizouNome = false;
 
             if (acao === 'retirar') {
-                if (quantidadeAcao > quantidadeAtual) {
-                    alert('Quantidade a retirar maior que a disponível.');
-                    return;
-                }
                 novaQtd = quantidadeAtual - quantidadeAcao;
             } else if (acao === 'adicionar') {
                 novaQtd = quantidadeAtual + quantidadeAcao;
