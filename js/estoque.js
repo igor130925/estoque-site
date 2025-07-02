@@ -86,8 +86,15 @@ document.addEventListener('DOMContentLoaded', async function() {
             const icon = getCategoryIcon(item.tipo);
             const validadeFormatada = item.data_validade ? new Date(item.data_validade).toLocaleDateString('pt-BR') : '-';
 
+            // Adicione a coluna de imagem; suponho que a propriedade seja item.imagem (url)
+            // Caso o campo seja diferente, substitua abaixo
+            const imagemURL = item.imagem || ''; // URL da imagem ou string vazia
+
             row.innerHTML = `
                 <td>${item.id}</td>
+                <td>
+                    ${imagemURL ? `<img src="${imagemURL}" alt="${item.nome}" style="width:50px; height:50px; object-fit: cover; border-radius: 4px;">` : '-'}
+                </td>
                 <td>${item.nome}</td>
                 <td><span class="category">${icon} ${formatCategory(item.tipo)}</span></td>
                 <td>${item.quantidade}</td>
