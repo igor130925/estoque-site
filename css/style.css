@@ -370,3 +370,21 @@ body {
     }
     
 }
+.form-errors {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #ffe5e5;
+  border: 1px solid #cc0000;
+  border-radius: 6px;
+  color: #cc0000;
+  font-size: 0.95rem;
+}
+
+.error-message {
+  margin: 5px 0;
+}
+
+.input-error {
+  border-color: #cc0000 !important;
+  background-color: #fff5f5;
+}

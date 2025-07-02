@@ -11,6 +11,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileMenu = document.getElementById('mobileMenu');
   const closeMenu = document.getElementById('closeMenu');
 
+  const nameInput = document.getElementById('productName');
+  const quantityInput = document.getElementById('productQuantity');
+  const dateInput = document.getElementById('productDate');
+
+  const errorContainer = document.getElementById('formErrors');
+
+  function showError(message, field = null) {
+    const error = document.createElement('div');
+    error.className = 'error-message';
+    error.textContent = message;
+    errorContainer.appendChild(error);
+
+    if (field) field.classList.add('input-error');
+  }
+
+  function clearErrors() {
+    errorContainer.innerHTML = '';
+    document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+  }
+
   menuBtn.addEventListener('click', () => {
     mobileMenu.style.display = 'block';
   });
@@ -22,10 +42,10 @@ document.addEventListener('DOMContentLoaded', () => {
   productType.addEventListener('change', function () {
     if (this.value === 'perecivel') {
       dateField.style.display = 'block';
-      document.getElementById('productDate').required = true;
+      dateInput.required = true;
     } else {
       dateField.style.display = 'none';
-      document.getElementById('productDate').required = false;
+      dateInput.required = false;
     }
   });
 
@@ -54,31 +74,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
   productForm.addEventListener('submit', async e => {
     e.preventDefault();
+    clearErrors();
 
     const productData = {
-      nome: document.getElementById('productName').value.trim(),
-      quantidade: parseInt(document.getElementById('productQuantity').value, 10),
+      nome: nameInput.value.trim(),
+      quantidade: parseInt(quantityInput.value, 10),
       tipo: productType.value,
-      data_validade:
-        productType.value === 'perecivel' ? document.getElementById('productDate').value : null,
+      data_validade: productType.value === 'perecivel' ? dateInput.value : null,
     };
 
+    let isValid = true;
+
     if (!productData.nome) {
-      alert('Nome do produto é obrigatório');
-      return;
+      showError('Nome do produto é obrigatório.', nameInput);
+      isValid = false;
     }
     if (isNaN(productData.quantidade) || productData.quantidade < 0) {
-      alert('Quantidade inválida');
-      return;
+      showError('Quantidade inválida.', quantityInput);
+      isValid = false;
     }
     if (!productData.tipo) {
-      alert('Tipo do produto é obrigatório');
-      return;
+      showError('Tipo do produto é obrigatório.', productType);
+      isValid = false;
     }
     if (productData.tipo === 'perecivel' && !productData.data_validade) {
-      alert('Data de validade é obrigatória para produtos perecíveis');
-      return;
+      showError('Data de validade é obrigatória para produtos perecíveis.', dateInput);
+      isValid = false;
     }
+
+    if (!isValid) return;
 
     try {
       await createProduct(productData, imageInput.files);
@@ -91,8 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
       productForm.reset();
       imagePreview.innerHTML = '';
       dateField.style.display = 'none';
+      clearErrors();
     } catch (error) {
-      alert('Erro ao salvar produto: ' + (error.message || error));
+      showError('Erro ao salvar produto: ' + (error.message || error));
     }
   });
 });
