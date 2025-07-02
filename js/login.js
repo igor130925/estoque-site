@@ -41,3 +41,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+// Dentro da função de login, após o login bem-sucedido
+await ensureUserProfile(user.id, user.email);
