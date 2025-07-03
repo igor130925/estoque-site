@@ -9,7 +9,7 @@ export async function uploadProductImage(file) {
     .upload(fileName, file, {
       cacheControl: '3600',
       upsert: false,
-      contentType: file.type, // importante para upload correto
+      contentType: file.type,
     });
 
   if (error) throw error;
@@ -23,7 +23,7 @@ export async function uploadProductImage(file) {
   return urlData.publicUrl;
 }
 
-// Busca todos os produtos, incluindo array de URLs das imagens
+// Busca todos os produtos
 export async function getProducts() {
   const { data, error } = await supabase
     .from('produtos')
@@ -124,14 +124,14 @@ export async function relocateProduct(productId, data) {
   return true;
 }
 
-// Obtém estatísticas do sistema
+// Obtém estatísticas
 export async function getSystemStats() {
   const { count: totalProducts, error: err1 } = await supabase
     .from('produtos')
     .select('*', { count: 'exact', head: true });
   if (err1) throw err1;
 
-  const totalUsers = 10; // ajuste se tiver tabela de usuários
+  const totalUsers = 10;
 
   const { count: lowStockProducts, error: err2 } = await supabase
     .from('produtos')
@@ -142,7 +142,7 @@ export async function getSystemStats() {
   return { totalProducts, totalUsers, lowStockProducts };
 }
 
-// Busca movimentações com dados do produto relacionados
+// Busca movimentações
 export async function getMovements() {
   const { data, error } = await supabase
     .from('movimentacoes')
@@ -161,7 +161,7 @@ export async function getMovements() {
   return data;
 }
 
-// Função para registrar movimentação detalhada
+// Registra movimentação detalhada
 export async function registrarMovimentacaoDetalhada(movimentacao) {
   try {
     const { data, error } = await supabase
@@ -175,7 +175,7 @@ export async function registrarMovimentacaoDetalhada(movimentacao) {
   }
 }
 
-// Função genérica para registrar movimentação simples
+// Registra movimentação simples
 export async function registrarMovimentacao(tipo, pagina, itemId, detalhes) {
   try {
     const usuario = JSON.parse(localStorage.getItem('currentUser'))?.email || 'Sistema';
@@ -195,4 +195,14 @@ export async function registrarMovimentacao(tipo, pagina, itemId, detalhes) {
   } catch (error) {
     console.error('Erro ao registrar movimentação:', error);
   }
+}
+
+// ✅ Nova função: garantir perfil no localStorage
+export function ensureUserProfile(id, email) {
+  const userData = {
+    id,
+    email,
+    name: email.split('@')[0],
+  };
+  localStorage.setItem('currentUser', JSON.stringify(userData));
 }

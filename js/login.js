@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient.js';
+import { ensureUserProfile } from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('loginForm');
@@ -30,10 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Salvar usuário no localStorage
-      localStorage.setItem('currentUser', JSON.stringify(user));
+      // ✅ Garante perfil do usuário no localStorage
+      ensureUserProfile(user.id, user.email);
 
-      // Redirecionar para o painel de estoque
+      // Redirecionar para o painel
       window.location.href = 'estoque.html';
     } catch (err) {
       console.error(err);
@@ -41,5 +42,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-// Dentro da função de login, após o login bem-sucedido
-await ensureUserProfile(user.id, user.email);
