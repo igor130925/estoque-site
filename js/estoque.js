@@ -110,7 +110,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
     }
 
-    document.getElementById('currentUser').textContent = currentUser.name;
+    const elCurrentUser = document.getElementById('currentUser');
+    if (elCurrentUser) {
+      elCurrentUser.textContent = currentUser.name;
+    } else {
+      console.warn('Elemento com id "currentUser" não encontrado no DOM');
+    }
 
     let estoque = [];
 

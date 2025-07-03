@@ -1,68 +1,66 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Meu Perfil - Sistema de Estoque</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/perfil.css"> <!-- Importa estilos específicos do perfil -->
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/perfil.css" />
 </head>
 <body>
     <!-- Barra de navegação -->
-  <header class="top-nav">
-    <div class="nav-container">
-      <button class="menu-btn" id="menuBtn" aria-label="Abrir menu"><i class="fas fa-bars"></i></button>
-      <h1 class="logo">Sistema de Estoque</h1>
-      <nav class="desktop-nav" aria-label="Navegação principal">
-        <ul>
-          <li><a href="produtos.html"><i class="fas fa-boxes" aria-hidden="true"></i> Produtos</a></li>
-          <li><a href="movimentaçao.html"><i class="fas fa-chart-bar"></i> movimentacao</a></li>
-            <li><a href="estoque.html"><i class="fas fa-chart-bar"></i> estoque</a></li>
-            <li><a href="index.html"><i class="fas fa-chart-bar"></i>sair</a></li>
+    <header class="top-nav">
+        <div class="nav-container">
+            <button class="menu-btn" id="menuBtn" aria-label="Abrir menu"><i class="fas fa-bars"></i></button>
+            <h1 class="logo">Sistema de Estoque</h1>
+            <nav class="desktop-nav" aria-label="Navegação principal">
+                <ul>
+                    <li><a href="produtos.html"><i class="fas fa-boxes" aria-hidden="true"></i> Produtos</a></li>
+                    <li><a href="movimentaçao.html"><i class="fas fa-chart-bar"></i> movimentacao</a></li>
+                    <li><a href="estoque.html"><i class="fas fa-chart-bar"></i> estoque</a></li>
+                    <li><a href="index.html"><i class="fas fa-chart-bar"></i> sair</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-      </nav>
-    </div>
-  </header>
     <main class="profile-container">
         <h1>Meu Perfil</h1>
-        
- <div class="profile-info">
-                <div class="form-group">
-                    <label for="userName">Nome:</label>
-                    <input type="text" id="userName" class="form-control">
-                    <button id="saveNameBtn" class="btn-primary">Salvar Nome</button>
-                </div>
-            
-            <div class="profile-info">
-                <div class="form-group">
-                    <label for="userName">codigo/pessoa:</label>
-                    <input type="text" id="userName" class="form-control">
-                </div>
-                
-        
-                </div>
+
+        <div class="profile-info">
+            <div class="form-group">
+                <label for="userName">Nome:</label>
+                <input type="text" id="userName" class="form-control" />
+                <button id="saveNameBtn" class="btn-primary">Salvar Nome</button>
+            </div>
+
+            <div class="form-group">
+                <label for="userCode">Código/Pessoa:</label>
+                <input type="text" id="userCode" class="form-control" readonly />
             </div>
         </div>
-        
+
         <div class="password-section">
             <h2>Alterar Senha</h2>
             <div class="form-group">
                 <label for="currentPassword">Senha Atual:</label>
-                <input type="password" id="currentPassword" class="form-control">
+                <input type="password" id="currentPassword" class="form-control" />
             </div>
             <div class="form-group">
                 <label for="newPassword">Nova Senha:</label>
-                <input type="password" id="newPassword" class="form-control">
+                <input type="password" id="newPassword" class="form-control" />
             </div>
             <div class="form-group">
                 <label for="confirmPassword">Confirmar Nova Senha:</label>
-                <input type="password" id="confirmPassword" class="form-control">
+                <input type="password" id="confirmPassword" class="form-control" />
             </div>
             <button id="changePasswordBtn" class="btn-primary">Alterar Senha</button>
         </div>
+
+        <button id="logoutBtn" class="btn-logout">Sair</button>
     </main>
 
-    <script src="js/supabaseClient.js"></script>
-    <script src="js/perfil.js"></script>
+    <!-- Importa o perfil.js como módulo para permitir importações internas -->
+    <script type="module" src="js/perfil.js"></script>
 </body>
 </html>
