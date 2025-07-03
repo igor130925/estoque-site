@@ -18,7 +18,7 @@ async function loadUserProfile() {
     
     if (error) {
         console.error('Erro ao carregar perfil:', error);
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
         return;
     }
     
@@ -48,18 +48,7 @@ async function handleAvatarUpload(event) {
     const fileName = `${user.id}-avatar.${fileExt}`;
     const filePath = `avatars/${fileName}`;
     
-    // Faz upload da imagem
-    const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: true
-        });
-    
-    if (uploadError) {
-        console.error('Erro no upload:', uploadError);
-        return;
-    }
+
     
     // Obtém URL pública
     const { data: { publicUrl } } = supabase.storage
@@ -146,5 +135,5 @@ async function updatePassword() {
 
 async function logout() {
     const { error } = await supabase.auth.signOut();
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
 }

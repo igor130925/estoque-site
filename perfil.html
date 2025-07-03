@@ -8,36 +8,38 @@
     <link rel="stylesheet" href="css/perfil.css"> <!-- Importa estilos específicos do perfil -->
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="estoque.html">Estoque</a>
-            <a href="produtos.html">Produtos</a>
-            <a href="movimentacao.html">Movimentação</a>
-            <a href="perfil.html" class="active">Meu Perfil</a>
-            <button id="logoutBtn">Sair</button>
-        </nav>
-    </header>
+    <!-- Barra de navegação -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <button class="menu-btn" id="menuBtn" aria-label="Abrir menu"><i class="fas fa-bars"></i></button>
+      <h1 class="logo">Sistema de Estoque</h1>
+      <nav class="desktop-nav" aria-label="Navegação principal">
+        <ul>
+          <li><a href="produtos.html"><i class="fas fa-boxes" aria-hidden="true"></i> Produtos</a></li>
+          <li><a href="movimentaçao.html"><i class="fas fa-chart-bar"></i> movimentacao</a></li>
+            <li><a href="estoque.html"><i class="fas fa-chart-bar"></i> estoque</a></li>
+            <li><a href="index.html"><i class="fas fa-chart-bar"></i>sair</a></li>
 
+      </nav>
+    </div>
+  </header>
     <main class="profile-container">
         <h1>Meu Perfil</h1>
         
-        <div class="profile-section">
-            <div class="avatar-container">
-                <img id="avatarPreview" src="images/default-avatar.png" alt="Avatar">
-                <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
-                <button id="changeAvatarBtn">Alterar Foto</button>
-            </div>
-            
-            <div class="profile-info">
+ <div class="profile-info">
                 <div class="form-group">
                     <label for="userName">Nome:</label>
                     <input type="text" id="userName" class="form-control">
                     <button id="saveNameBtn" class="btn-primary">Salvar Nome</button>
                 </div>
-                
+            
+            <div class="profile-info">
                 <div class="form-group">
-                    <label for="userEmail">Email:</label>
-                    <input type="email" id="userEmail" class="form-control" disabled>
+                    <label for="userName">codigo/pessoa:</label>
+                    <input type="text" id="userName" class="form-control">
+                </div>
+                
+        
                 </div>
             </div>
         </div>
