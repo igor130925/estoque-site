@@ -23,7 +23,7 @@ export async function uploadProductImage(file) {
   return urlData.publicUrl;
 }
 
-// Busca todos os produtos
+// Busca todos os produtos, incluindo array de URLs das imagens
 export async function getProducts() {
   const { data, error } = await supabase
     .from('produtos')
@@ -124,7 +124,7 @@ export async function relocateProduct(productId, data) {
   return true;
 }
 
-// Obtém estatísticas
+// Obtém estatísticas do sistema
 export async function getSystemStats() {
   const { count: totalProducts, error: err1 } = await supabase
     .from('produtos')
@@ -142,7 +142,7 @@ export async function getSystemStats() {
   return { totalProducts, totalUsers, lowStockProducts };
 }
 
-// Busca movimentações
+// Busca movimentações com dados do produto relacionados
 export async function getMovements() {
   const { data, error } = await supabase
     .from('movimentacoes')
@@ -161,7 +161,7 @@ export async function getMovements() {
   return data;
 }
 
-// Registra movimentação detalhada
+// Registrar movimentação detalhada
 export async function registrarMovimentacaoDetalhada(movimentacao) {
   try {
     const { data, error } = await supabase
@@ -175,10 +175,10 @@ export async function registrarMovimentacaoDetalhada(movimentacao) {
   }
 }
 
-// Registra movimentação simples
+// Registrar movimentação simples
 export async function registrarMovimentacao(tipo, pagina, itemId, detalhes) {
   try {
-    const usuario = JSON.parse(localStorage.getItem('currentUser'))?.email || 'Sistema';
+    const usuario = JSON.parse(localStorage.getItem('currentUser'))?.personcode || 'Sistema';
 
     const { data, error } = await supabase
       .from('movimentacoes')
@@ -197,12 +197,12 @@ export async function registrarMovimentacao(tipo, pagina, itemId, detalhes) {
   }
 }
 
-// ✅ Nova função: garantir perfil no localStorage
-export function ensureUserProfile(id, email) {
+// ✅ Corrigido: garante o perfil do usuário logado usando os campos reais
+export function ensureUserProfile(user) {
   const userData = {
-    id,
-    email,
-    name: email.split('@')[0],
+    id: user.id,
+    personcode: user.personcode,
+    name: user.name || 'Usuário',
   };
   localStorage.setItem('currentUser', JSON.stringify(userData));
 }

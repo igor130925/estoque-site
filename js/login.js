@@ -31,8 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // ✅ Garante perfil do usuário no localStorage
-      ensureUserProfile(user.id, user.email);
+      // ✅ Salvar perfil formatado no localStorage
+      ensureUserProfile(user);
 
       // Redirecionar para o painel
       window.location.href = 'estoque.html';
