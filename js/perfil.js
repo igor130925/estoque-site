@@ -1,12 +1,31 @@
 import { supabase } from './supabaseClient.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     loadUserProfile();
 
     document.getElementById('saveNameBtn').addEventListener('click', updateUserName);
     document.getElementById('changePasswordBtn').addEventListener('click', updatePassword);
     document.getElementById('logoutBtn').addEventListener('click', logout);
 });
+
+function showMessage(text, type = 'success') {
+    const box = document.getElementById('messageBox');
+    box.textContent = text;
+    box.className = 'message-box ' + type; // 'success' ou 'error'
+    box.style.display = 'block';
+    box.style.opacity = '1';
+
+    // Esconde depois de 5 segundos com fade-out
+    setTimeout(() => {
+        box.style.opacity = '0';
+        setTimeout(() => {
+            box.style.display = 'none';
+            box.textContent = '';
+            box.className = 'message-box';
+            box.style.opacity = '1';
+        }, 300);
+    }, 5000);
+}
 
 function loadUserProfile() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -15,21 +34,20 @@ function loadUserProfile() {
         return;
     }
 
-    // Preenche os campos
-    document.getElementById('userName').value = currentUser.name;
-    document.getElementById('userCode').value = currentUser.personcode;
+    document.getElementById('userName').value = currentUser.name || '';
+    document.getElementById('userCode').value = currentUser.personcode || '';
 }
 
 async function updateUserName() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) {
-        alert('Usuário não autenticado');
+        showMessage('Usuário não autenticado', 'error');
         return;
     }
 
     const newName = document.getElementById('userName').value.trim();
     if (!newName) {
-        alert('Por favor, insira um nome válido');
+        showMessage('Por favor, insira um nome válido', 'error');
         return;
     }
 
@@ -40,9 +58,9 @@ async function updateUserName() {
 
     if (error) {
         console.error('Erro ao atualizar nome:', error);
-        alert('Erro ao atualizar nome');
+        showMessage('Erro ao atualizar nome', 'error');
     } else {
-        alert('Nome atualizado com sucesso!');
+        showMessage('Nome atualizado com sucesso!', 'success');
         currentUser.name = newName;
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
     }
@@ -51,7 +69,7 @@ async function updateUserName() {
 async function updatePassword() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) {
-        alert('Usuário não autenticado');
+        showMessage('Usuário não autenticado', 'error');
         return;
     }
 
@@ -59,31 +77,50 @@ async function updatePassword() {
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
 
-    if (newPassword !== confirmPassword) {
-        alert('As senhas não coincidem');
+    if (!currentPassword) {
+        showMessage('Informe a senha atual', 'error');
         return;
     }
 
     if (newPassword.length < 6) {
-        alert('A senha deve ter pelo menos 6 caracteres');
+        showMessage('A senha deve ter pelo menos 6 caracteres', 'error');
         return;
     }
 
-    if (currentPassword !== currentUser.password) {
-        alert('Senha atual incorreta');
+    if (newPassword !== confirmPassword) {
+        showMessage('As senhas não coincidem', 'error');
         return;
     }
 
-    const { error } = await supabase
+    // Consulta a senha atual no banco para validar
+    const { data, error } = await supabase
+        .from('usuarios')
+        .select('password')
+        .eq('id', currentUser.id)
+        .single();
+
+    if (error) {
+        console.error('Erro ao consultar senha atual:', error);
+        showMessage('Erro ao validar senha atual', 'error');
+        return;
+    }
+
+    if (!data || data.password !== currentPassword) {
+        showMessage('Senha atual incorreta', 'error');
+        return;
+    }
+
+    // Atualiza a senha no banco
+    const { error: updateError } = await supabase
         .from('usuarios')
         .update({ password: newPassword })
         .eq('id', currentUser.id);
 
-    if (error) {
-        console.error('Erro ao atualizar senha:', error);
-        alert('Erro ao atualizar senha');
+    if (updateError) {
+        console.error('Erro ao atualizar senha:', updateError);
+        showMessage('Erro ao atualizar senha', 'error');
     } else {
-        alert('Senha atualizada com sucesso!');
+        showMessage('Senha atualizada com sucesso!', 'success');
         currentUser.password = newPassword;
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
 

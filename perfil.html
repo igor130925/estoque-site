@@ -6,6 +6,8 @@
     <title>Meu Perfil - Sistema de Estoque</title>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/perfil.css" />
+    <!-- FontAwesome para ícones -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <!-- Barra de navegação -->
@@ -18,13 +20,16 @@
                     <li><a href="produtos.html"><i class="fas fa-boxes" aria-hidden="true"></i> Produtos</a></li>
                     <li><a href="movimentaçao.html"><i class="fas fa-chart-bar"></i> movimentacao</a></li>
                     <li><a href="estoque.html"><i class="fas fa-chart-bar"></i> estoque</a></li>
-                    <li><a href="index.html"><i class="fas fa-chart-bar"></i> sair</a></li>
+                    <li><a href="index.html"><i class="fas fa-sign-out-alt"></i> sair</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
     <main class="profile-container">
+        <!-- Caixa para mensagens globais de sucesso ou erro -->
+        <div id="messageBox" class="message-box"></div>
+
         <h1>Meu Perfil</h1>
 
         <div class="profile-info">
@@ -60,7 +65,6 @@
         <button id="logoutBtn" class="btn-logout">Sair</button>
     </main>
 
-    <!-- Importa o perfil.js como módulo para permitir importações internas -->
     <script type="module" src="js/perfil.js"></script>
 </body>
 </html>
