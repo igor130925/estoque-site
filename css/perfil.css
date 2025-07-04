@@ -1,4 +1,11 @@
-/* Estilos para a página de perfil */
+:root {
+    --primary: #007bff;
+    --secondary: #0056b3;
+    --white: #fff;
+    --gray-light: #f8f9fa;
+}
+
+/* Página de perfil */
 .profile-container {
     max-width: 900px;
     margin: 40px auto;
@@ -15,7 +22,6 @@
     text-align: center;
 }
 
-/* Seções do perfil */
 .profile-section {
     display: flex;
     gap: 30px;
@@ -61,7 +67,6 @@
     min-width: 250px;
 }
 
-/* Seção de senha */
 .password-section {
     margin-top: 40px;
     border-top: 1px solid #ddd;
@@ -90,7 +95,6 @@
     background-color: var(--secondary);
 }
 
-/* Responsividade */
 @media (max-width: 768px) {
     .profile-section {
         flex-direction: column;
@@ -107,7 +111,7 @@
     }
 }
 
-/* Caixa de mensagens - feedback global no topo do formulário */
+/* Mensagem global de formulário */
 .message-box {
     margin: 10px 0 25px 0;
     padding: 15px 25px;
@@ -115,8 +119,10 @@
     font-weight: 600;
     font-size: 1.1rem;
     display: none;
+    opacity: 0;
     transition: opacity 0.3s ease;
     text-align: center;
+    pointer-events: none;
 }
 
 .message-box.success {
@@ -129,4 +135,104 @@
     background-color: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
+}
+
+.message-box[style*="display: block"] {
+    pointer-events: auto;
+}
+
+/* Botões reutilizáveis */
+.btn {
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 10px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn.primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn.primary:hover {
+    background-color: var(--secondary);
+}
+
+.btn.secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn.secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Inputs e erros */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.form-errors {
+    margin-top: 6px;
+    padding: 8px 12px;
+    background-color: #ffe5e5;
+    border: 1px solid #cc0000;
+    border-radius: 6px;
+    color: #cc0000;
+    font-size: 0.9rem;
+}
+
+.error-message {
+    margin: 3px 0;
+}
+
+.input-error {
+    border-color: #cc0000 !important;
+    background-color: #fff5f5;
+}
+
+/* Mensagem de sucesso flutuante (nova) */
+.success-message {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #28a745;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    font-size: 1rem;
+    animation: fadein 0.5s ease;
+}
+
+.success-message i {
+    font-size: 1.2rem;
+}
+
+@keyframes fadein {
+    from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
