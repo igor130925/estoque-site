@@ -1,11 +1,23 @@
-// js/movimentacao.js
 import { getMovements } from './api.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
   const inputBusca = document.getElementById('busca-texto');
   inputBusca.addEventListener('input', carregarMovimentacoes);
 
-  await carregarMovimentacoes(); // Carrega inicialmente
+  // Controle do menu mobile
+  const menuBtn = document.getElementById('menuBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const closeMenu = document.getElementById('closeMenu');
+
+  menuBtn.addEventListener('click', () => {
+    mobileMenu.classList.add('open');
+  });
+
+  closeMenu.addEventListener('click', () => {
+    mobileMenu.classList.remove('open');
+  });
+
+  carregarMovimentacoes(); // Carrega inicialmente
 });
 
 async function carregarMovimentacoes() {

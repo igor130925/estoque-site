@@ -31,12 +31,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
   }
 
+  // Animação do menu mobile
   menuBtn.addEventListener('click', () => {
-    mobileMenu.style.display = 'block';
+    mobileMenu.classList.add('open');
   });
 
   closeMenu.addEventListener('click', () => {
-    mobileMenu.style.display = 'none';
+    mobileMenu.classList.remove('open');
   });
 
   productType.addEventListener('change', function () {

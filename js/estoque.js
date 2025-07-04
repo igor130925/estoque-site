@@ -1,6 +1,6 @@
 import { getProducts, updateProduct, registrarMovimentacaoDetalhada } from './api.js';
 
-// Criar modal galeria imagens no body (com botões)
+// --- Modal galeria imagens ---
 const modalGaleria = document.createElement('div');
 modalGaleria.id = 'modalGaleria';
 modalGaleria.style.cssText = `
@@ -77,7 +77,6 @@ btnNextGaleria.addEventListener('click', e => {
 });
 
 modalGaleria.addEventListener('click', e => {
-    // Fecha modal se clicar fora da imagem (no fundo)
     if (e.target === modalGaleria) {
         modalGaleria.style.display = 'none';
         imgGaleria.src = '';
@@ -88,7 +87,6 @@ function mostrarImagemGaleria() {
     imgGaleria.src = imagensAtual[indiceImagemAtual];
     imgGaleria.alt = `Imagem ${indiceImagemAtual + 1} de ${imagensAtual.length}`;
 
-    // Se só tiver 1 imagem, oculta os botões de navegação
     const mostrarBotoes = imagensAtual.length > 1;
     btnPrevGaleria.style.display = mostrarBotoes ? 'block' : 'none';
     btnNextGaleria.style.display = mostrarBotoes ? 'block' : 'none';
@@ -96,11 +94,34 @@ function mostrarImagemGaleria() {
 
 function abrirModalGaleria(imagens) {
     if (!imagens || imagens.length === 0) return;
-    imagensAtual = imagens.slice(0,4); // até 4 imagens
+    imagensAtual = imagens.slice(0, 4);
     indiceImagemAtual = 0;
     mostrarImagemGaleria();
     modalGaleria.style.display = 'flex';
 }
+
+// --- MENU MOBILE ---
+// Seleção dos elementos do menu
+const menuBtn = document.getElementById('menuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+const closeMenu = document.getElementById('closeMenu');
+
+// Abre menu ao clicar no botão do menu
+menuBtn?.addEventListener('click', () => {
+  mobileMenu.classList.add('open');
+});
+
+// Fecha menu ao clicar no botão fechar
+closeMenu?.addEventListener('click', () => {
+  mobileMenu.classList.remove('open');
+});
+
+// Fecha menu ao clicar em qualquer link interno (melhora UX)
+mobileMenu?.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
+    mobileMenu.classList.remove('open');
+  });
+});
 
 document.addEventListener('DOMContentLoaded', async function() {
     // Verificar autenticação
@@ -130,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const quantidadeAcaoGrupo = document.getElementById('quantidadeAcaoGrupo');
     const responsavelGrupo = document.getElementById('responsavelGrupo');
 
-    // Funções de notificação (igual seu código)
+    // Funções de notificação
     function mostrarMensagem(mensagem) {
         const notification = document.getElementById('notification');
         notification.textContent = mensagem;
@@ -190,10 +211,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             const icon = getCategoryIcon(item.tipo);
             const validadeFormatada = item.data_validade ? new Date(item.data_validade).toLocaleDateString('pt-BR') : '-';
 
-            // Pega até 4 imagens para o produto
             const imagens = (item.imagem_url && item.imagem_url.length > 0) ? item.imagem_url.slice(0,4) : [];
-
-            // Exibe só a primeira imagem como thumbnail, clicável para abrir o modal
             const primeiraImagem = imagens[0] || '';
 
             row.innerHTML = `
@@ -214,7 +232,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                 </td>
             `;
 
-            // Adiciona evento para abrir modal galeria na imagem
             if (primeiraImagem) {
                 const imgElement = row.querySelector('img.img-thumb');
                 imgElement.addEventListener('click', () => abrirModalGaleria(imagens));

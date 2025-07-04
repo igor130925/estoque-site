@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Produtos - Sistema de Estoque</title>
   <link rel="stylesheet" href="css/style.css" />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 </head>
 <body>
   <!-- Barra de navegação -->
@@ -20,27 +17,20 @@
         <ul>
           <li><a href="estoque.html"><i class="fas fa-chart-bar"></i> Estoque</a></li>
           <li><a href="movimentaçao.html"><i class="fas fa-chart-bar"></i> Movimentação</a></li>
-           <li><a href="perfil.html"><i class="fas fa-chart-bar"></i> perfil</a></li>
+          <li><a href="perfil.html"><i class="fas fa-chart-bar"></i> Perfil</a></li>
         </ul>
       </nav>
     </div>
   </header>
 
-  <!-- Menu mobile -->
-  <div class="menu-mobile" id="mobileMenu" style="display:none;">
+  <!-- Menu mobile (idêntico ao nav) -->
+  <div class="menu-mobile" id="mobileMenu">
     <button class="close-btn" id="closeMenu" aria-label="Fechar menu">&times;</button>
-    <div class="user-profile">
-      <div class="user-avatar"><i class="fas fa-user-circle"></i></div>
-      <div class="user-info">
-        <span id="userNameDisplay">Usuário</span>
-        <span class="user-role">Navegação</span>
-      </div>
-    </div>
     <nav>
       <ul>
-        <li><a href="produtos.html"><i class="fas fa-boxes"></i> Todos os Produtos</a></li>
-        <li><a href="registro.html"><i class="fas fa-user-plus"></i> Registrar Usuário</a></li>
-        <li><a href="relatorios.html"><i class="fas fa-chart-bar"></i> Relatórios</a></li>
+        <li><a href="estoque.html"><i class="fas fa-chart-bar"></i> Estoque</a></li>
+        <li><a href="movimentaçao.html"><i class="fas fa-chart-bar"></i> Movimentação</a></li>
+        <li><a href="perfil.html"><i class="fas fa-chart-bar"></i> Perfil</a></li>
       </ul>
     </nav>
   </div>
@@ -53,19 +43,19 @@
       </div>
       <div class="card-body">
 
-        <!-- 🔽 MENSAGENS DE ERRO AQUI -->
+        <!-- Mensagens de erro -->
         <div id="formErrors" class="form-errors"></div>
 
         <form id="productForm" autocomplete="off" novalidate>
           <div class="form-group">
             <label for="productName"><i class="fas fa-tag"></i> Nome do Produto</label>
-            <input type="text" id="productName" required autocomplete="off" />
+            <input type="text" id="productName" required />
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label for="productQuantity"><i class="fas fa-cubes"></i> Quantidade</label>
-              <input type="number" id="productQuantity" required min="0" autocomplete="off" />
+              <input type="number" id="productQuantity" required min="0" />
             </div>
             <div class="form-group">
               <label for="productType"><i class="fas fa-list"></i> Tipo</label>
@@ -80,7 +70,6 @@
             </div>
           </div>
 
-          <!-- Campo de validade oculto inicialmente -->
           <div class="form-group" id="dateField" style="display: none;">
             <label for="productDate"><i class="fas fa-calendar-alt"></i> Data de Validade</label>
             <input type="date" id="productDate" />
@@ -88,13 +77,7 @@
 
           <div class="form-group">
             <label for="productImages"><i class="fas fa-images"></i> Imagens (máx. 4)</label>
-            <input
-              type="file"
-              id="productImages"
-              multiple
-              accept="image/*"
-              aria-describedby="imageHelp"
-            />
+            <input type="file" id="productImages" multiple accept="image/*" />
             <small id="imageHelp" class="form-hint">Selecione até 4 imagens</small>
             <div class="image-preview" id="imagePreview"></div>
           </div>

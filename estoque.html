@@ -6,30 +6,51 @@
   <title>Estoque - Sistema de Gerenciamento</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/estoque.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  />
 </head>
 <body>
   <!-- Barra de navegação -->
   <header class="top-nav">
     <div class="nav-container">
-      <button class="menu-btn" id="menuBtn" aria-label="Abrir menu"><i class="fas fa-bars"></i></button>
+      <!-- Botão menu mobile -->
+      <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">
+        <i class="fas fa-bars"></i>
+      </button>
+
       <h1 class="logo">Sistema de Estoque</h1>
+
+      <!-- Navegação desktop -->
       <nav class="desktop-nav" aria-label="Navegação principal">
         <ul>
           <li><a href="produtos.html"><i class="fas fa-boxes" aria-hidden="true"></i> Produtos</a></li>
-          <li><a href="movimentaçao.html"><i class="fas fa-chart-bar"></i> movimentacao</a></li>
-          <li><a href="perfil.html"><i class="fas fa-chart-bar"></i> perfil</a></li>
+          <li><a href="movimentaçao.html"><i class="fas fa-chart-bar"></i> Movimentação</a></li>
+          <li><a href="perfil.html"><i class="fas fa-user"></i> Perfil</a></li>
         </ul>
       </nav>
     </div>
   </header>
+
+  <!-- Menu mobile -->
+  <div class="menu-mobile" id="mobileMenu" aria-hidden="true" hidden>
+    <button class="close-btn" id="closeMenu" aria-label="Fechar menu">&times;</button>
+    <nav aria-label="Menu móvel">
+      <ul>
+        <li><a href="produtos.html"><i class="fas fa-boxes"></i> Produtos</a></li>
+        <li><a href="movimentaçao.html"><i class="fas fa-chart-bar"></i> Movimentação</a></li>
+        <li><a href="perfil.html"><i class="fas fa-user"></i> Perfil</a></li>
+      </ul>
+    </nav>
+  </div>
 
   <!-- Menu Superior -->
   <header class="top-bar">
     <div class="container">
       <h1><i class="fas fa-boxes" aria-hidden="true"></i> Controle de Estoque</h1>
       <div class="user-info">
-        <!-- Aqui o elemento para mostrar o nome do usuário -->
+        <!-- Elemento para mostrar o nome do usuário -->
         <span id="currentUser" style="font-weight:bold;"></span>
       </div>
     </div>
@@ -84,7 +105,15 @@
     </section>
 
     <!-- Modal de Ações -->
-    <div id="modalAcoes" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalAcoesTitle" aria-hidden="true" hidden>
+    <div
+      id="modalAcoes"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalAcoesTitle"
+      aria-hidden="true"
+      hidden
+    >
       <div class="modal-content">
         <div class="modal-header">
           <h3 id="modalAcoesTitle"><i class="fas fa-tools"></i> Ações no Produto</h3>
@@ -132,14 +161,9 @@
       </div>
     </div>
 
-    <!-- Modal Galeria de Imagens -->
-    <!-- O modal da galeria será criado dinamicamente via JS, mas você pode colocar esse div como fallback se quiser -->
-    <!-- Não é obrigatório, pois o modal é criado dinamicamente em estoque.js -->
-
+    <!-- Div para notificação -->
+    <div id="notification" class="notification" hidden></div>
   </main>
-
-  <!-- Div para notificação -->
-  <div id="notification" class="notification" hidden></div>
 
   <script type="module" src="js/estoque.js"></script>
 </body>

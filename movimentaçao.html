@@ -12,18 +12,38 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
+  <!-- Cabeçalho com menu e logo -->
   <header class="top-nav">
     <div class="nav-container">
+      <!-- Botão menu mobile -->
+      <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">
+        <i class="fas fa-bars"></i>
+      </button>
+
       <h1 class="logo">Controle de Movimentações</h1>
+
+      <!-- Navegação desktop -->
       <nav class="desktop-nav">
         <ul>
           <li><a href="produtos.html"><i class="fas fa-box"></i> Produtos</a></li>
           <li><a href="estoque.html"><i class="fas fa-warehouse"></i> Estoque</a></li>
-           <li><a href="perfil.html"><i class="fas fa-chart-bar"></i> perfil</a></li>
+          <li><a href="perfil.html"><i class="fas fa-chart-bar"></i> Perfil</a></li>
         </ul>
       </nav>
     </div>
   </header>
+
+  <!-- Menu mobile -->
+  <div class="menu-mobile" id="mobileMenu" aria-hidden="true">
+    <button class="close-btn" id="closeMenu" aria-label="Fechar menu">&times;</button>
+    <nav>
+      <ul>
+        <li><a href="produtos.html"><i class="fas fa-box"></i> Produtos</a></li>
+        <li><a href="estoque.html"><i class="fas fa-warehouse"></i> Estoque</a></li>
+        <li><a href="perfil.html"><i class="fas fa-chart-bar"></i> Perfil</a></li>
+      </ul>
+    </nav>
+  </div>
 
   <main class="container movimentacoes-container">
     <!-- Seção de filtros / busca -->
