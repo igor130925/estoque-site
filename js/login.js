@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    errorLogin.textContent = ''; // limpa mensagem anterior
+
     const personcode = personCodeInput.value.trim();
     const password = passwordInput.value;
 
@@ -26,16 +28,43 @@ document.addEventListener('DOMContentLoaded', () => {
         .eq('password', password)
         .maybeSingle();
 
-      if (error || !user) {
+      if (error) {
+        console.error('Erro Supabase:', error);
+        errorLogin.textContent = 'Erro ao fazer login.';
+        return;
+      }
+
+      if (!user) {
         errorLogin.textContent = 'Código ou senha inválidos';
         return;
       }
 
-      // ✅ Salvar perfil formatado no localStorage
-      ensureUserProfile(user);
+      // Debug: tipo e valor de autorizado
+      console.log('Valor de autorizado:', user.autorizado, typeof user.autorizado);
 
-      // Redirecionar para o painel
-      window.location.href = 'estoque.html';
+      // Verifica autorização do usuário
+      const autorizadoBool = user.autorizado === true || user.autorizado === 'true' || user.autorizado === 1;
+
+      if (!autorizadoBool) {
+        errorLogin.textContent = 'Usuário precisa ser autorizado por um administrador';
+        return;
+      }
+
+      // Montar objeto com admin como booleano explicitamente
+      const perfil = {
+        id: user.id,
+        name: user.name,
+        personcode: user.personcode,
+        admin: Boolean(user.admin),           // força booleano
+        autorizado: autorizadoBool
+      };
+
+      // Salvar perfil no localStorage diretamente
+      localStorage.setItem('currentUser', JSON.stringify(perfil));
+
+      // Redirecionar para o painel principal (perfil, estoque, etc)
+      window.location.href = 'perfil.html';
+
     } catch (err) {
       console.error(err);
       errorLogin.textContent = 'Erro ao fazer login.';
