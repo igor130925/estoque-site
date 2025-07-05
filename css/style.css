@@ -398,3 +398,32 @@ body {
 .menu-mobile.open {
   transform: translateX(0);
 }
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.user-table th,
+.user-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.user-table th {
+  background-color: #f4f4f4;
+}
+
+.user-table button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  background-color: #007bff;
+  cursor: pointer;
+}
+
+.user-table button.remove {
+  background-color: #dc3545;
+}

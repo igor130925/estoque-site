@@ -15,10 +15,10 @@
       <h1 class="logo">Sistema de Estoque</h1>
       <nav class="desktop-nav" aria-label="Navegação principal">
         <ul>
-          <li><a href="estoque.html"><i class="fas fa-boxes" aria-hidden="true"></i> Estoque</a></li>
-          <li><a href="movimentaçao.html"><i class="fas fa-exchange-alt" aria-hidden="true"></i> Movimentações</a></li>
-          <li><a href="produtos.html"><i class="fas fa-box" aria-hidden="true"></i> Produtos</a></li>
-          <li><a href="perfil.html"><i class="fas fa-user" aria-hidden="true"></i> Perfil</a></li>
+          <li><a href="estoque.html"><i class="fas fa-boxes"></i> Estoque</a></li>
+          <li><a href="movimentacao.html"><i class="fas fa-exchange-alt"></i> Movimentações</a></li>
+          <li><a href="produtos.html"><i class="fas fa-box"></i> Produtos</a></li>
+          <li><a href="perfil.html"><i class="fas fa-user"></i> Perfil</a></li>
         </ul>
       </nav>
     </div>
@@ -28,21 +28,19 @@
   <div class="menu-mobile" id="mobileMenu" aria-hidden="true" hidden>
     <button class="close-btn" id="closeMenu" aria-label="Fechar menu">&times;</button>
     <div class="user-profile">
-      <div class="user-avatar" aria-hidden="true">
-        <i class="fas fa-user-circle"></i>
-      </div>
+      <div class="user-avatar"><i class="fas fa-user-circle"></i></div>
       <div class="user-info">
         <span id="userNameDisplay">Usuário</span>
         <span class="user-role">Administrador</span>
       </div>
     </div>
-    <nav aria-label="Menu móvel">
+    <nav>
       <ul>
-        <li><a href="estoque.html"><i class="fas fa-boxes" aria-hidden="true"></i> Estoque</a></li>
-        <li><a href="movimentacao.html"><i class="fas fa-exchange-alt" aria-hidden="true"></i> Movimentações</a></li>
-        <li><a href="produtos.html"><i class="fas fa-box" aria-hidden="true"></i> Produtos</a></li>
-        <li><a href="perfil.html"><i class="fas fa-user" aria-hidden="true"></i> Perfil</a></li>
-        <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Sair</a></li>
+        <li><a href="estoque.html"><i class="fas fa-boxes"></i> Estoque</a></li>
+        <li><a href="movimentacao.html"><i class="fas fa-exchange-alt"></i> Movimentações</a></li>
+        <li><a href="produtos.html"><i class="fas fa-box"></i> Produtos</a></li>
+        <li><a href="perfil.html"><i class="fas fa-user"></i> Perfil</a></li>
+        <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
       </ul>
     </nav>
   </div>
@@ -50,27 +48,44 @@
   <!-- Top Bar -->
   <header class="top-bar">
     <div class="container">
-      <button id="menuBtn" class="menu-btn" aria-label="Abrir menu"><i class="fas fa-bars"></i></button>
+      <button id="menuBtn" class="menu-btn"><i class="fas fa-bars"></i></button>
       <h1 class="page-title">Painel Administrativo</h1>
       <div class="user-actions">
-        <div class="user-dropdown" tabindex="0" aria-haspopup="true" aria-expanded="false">
+        <div class="user-dropdown" tabindex="0">
           <span id="currentUserName">Usuário</span>
-          <i class="fas fa-user-circle" aria-hidden="true"></i>
+          <i class="fas fa-user-circle"></i>
         </div>
       </div>
     </div>
   </header>
 
   <!-- Conteúdo Principal -->
-  <main class="main-content" role="main">
+  <main class="main-content">
     <div class="container">
       <p>Bem-vindo ao painel administrativo.</p>
-      <!-- Você pode adicionar novos conteúdos aqui futuramente -->
+
+      <!-- Gerenciamento de usuários -->
+      <section id="user-management">
+        <h2>Gerenciamento de Usuários</h2>
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Código</th>
+              <th>Admin</th>
+              <th>Autorizado</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="userList">
+            <!-- Dados inseridos via JS -->
+          </tbody>
+        </table>
+      </section>
     </div>
   </main>
 
-  <script src="js/auth.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/admin.js"></script>
+  <script src="js/supabaseClient.js" type="module"></script>
+  <script src="js/admin.js" type="module"></script>
 </body>
 </html>
