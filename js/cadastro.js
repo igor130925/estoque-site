@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('currentUser', JSON.stringify({ name, personcode }));
 
       // Redirecionar para a tela de estoque
-      window.location.href = 'estoque.html';
+      window.location.href = 'index.html';
     } catch (err) {
       errorMessage.textContent = 'Erro ao cadastrar: ' + err.message;
     }

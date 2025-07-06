@@ -29,17 +29,25 @@ async function loadUsers() {
   data.forEach(user => {
     const tr = document.createElement('tr');
 
+    // Condicional: só exibe botões se não for admin
+    let actionButtons = '';
+    if (!user.admin) {
+      actionButtons = `
+        <button class="auth-btn" data-id="${user.id}" data-autorizado="${user.autorizado}">
+          ${user.autorizado ? 'Remover Autorização' : 'Autorizar'}
+        </button>
+        <button class="delete-btn" data-id="${user.id}">
+          Excluir
+        </button>
+      `;
+    }
+
     tr.innerHTML = `
       <td>${user.name}</td>
       <td>${user.personcode}</td>
       <td>${user.admin ? 'Sim' : 'Não'}</td>
       <td>${user.autorizado ? 'Sim' : 'Não'}</td>
-      <td>
-        <button class="auth-btn" data-id="${user.id}" data-autorizado="${user.autorizado}">
-          ${user.autorizado ? 'Remover Autorização' : 'Autorizar'}
-        </button>
-        <button class="delete-btn" data-id="${user.id}">Excluir</button>
-      </td>
+      <td>${actionButtons}</td>
     `;
 
     userList.appendChild(tr);
@@ -52,11 +60,28 @@ function addEventListeners() {
   document.querySelectorAll('.auth-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       const userId = btn.dataset.id;
-      const autorizadoAtual = btn.dataset.autorizado === 'true';
+
+      const { data: userData, error: fetchError } = await supabase
+        .from('usuarios')
+        .select('admin, autorizado')
+        .eq('id', userId)
+        .single();
+
+      if (fetchError || !userData) {
+        alert('Erro ao verificar usuário');
+        return;
+      }
+
+      if (userData.admin) {
+        alert('Não é permitido alterar a autorização de um administrador.');
+        return;
+      }
+
+      const novoStatus = !userData.autorizado;
 
       const { error } = await supabase
         .from('usuarios')
-        .update({ autorizado: !autorizadoAtual })
+        .update({ autorizado: novoStatus })
         .eq('id', userId);
 
       if (error) {
@@ -71,6 +96,23 @@ function addEventListeners() {
   document.querySelectorAll('.delete-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       const userId = btn.dataset.id;
+
+      const { data: userData, error: fetchError } = await supabase
+        .from('usuarios')
+        .select('admin')
+        .eq('id', userId)
+        .single();
+
+      if (fetchError || !userData) {
+        alert('Erro ao verificar usuário');
+        return;
+      }
+
+      if (userData.admin) {
+        alert('Não é permitido excluir um administrador.');
+        return;
+      }
+
       const confirmDelete = confirm('Tem certeza que deseja excluir este usuário?');
       if (!confirmDelete) return;
 
