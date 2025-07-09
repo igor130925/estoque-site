@@ -106,20 +106,23 @@ const menuBtn = document.getElementById('menuBtn');
 const mobileMenu = document.getElementById('mobileMenu');
 const closeMenu = document.getElementById('closeMenu');
 
-// Abre menu ao clicar no botão do menu
+// Abre menu ao clicar no botão do menu, removendo o hidden
 menuBtn?.addEventListener('click', () => {
   mobileMenu.classList.add('open');
+  mobileMenu.removeAttribute('hidden');
 });
 
-// Fecha menu ao clicar no botão fechar
+// Fecha menu ao clicar no botão fechar, adicionando o hidden
 closeMenu?.addEventListener('click', () => {
   mobileMenu.classList.remove('open');
+  mobileMenu.setAttribute('hidden', 'true');
 });
 
 // Fecha menu ao clicar em qualquer link interno (melhora UX)
 mobileMenu?.querySelectorAll('a').forEach(link => {
   link.addEventListener('click', () => {
     mobileMenu.classList.remove('open');
+    mobileMenu.setAttribute('hidden', 'true');
   });
 });
 
