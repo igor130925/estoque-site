@@ -117,10 +117,8 @@
 
 /* Melhorias extras para mobile abaixo */
 
-/* Em telas pequenas, transformar tabela em cards para melhor leitura */
 @media (max-width: 480px) {
     .movimentacoes-container .movements-table thead {
-        /* Esconde o cabeçalho da tabela */
         display: none;
     }
 
@@ -154,14 +152,14 @@
         text-align: left;
     }
     .movimentacoes-container .movements-table tbody td:nth-child(2)::before {
-        content: "Tipo:";
+        content: "Produto:";
         font-weight: 600;
         color: var(--primary, #4361ee);
         flex: 1;
         text-align: left;
     }
     .movimentacoes-container .movements-table tbody td:nth-child(3)::before {
-        content: "Produto:";
+        content: "Tipo:";
         font-weight: 600;
         color: var(--primary, #4361ee);
         flex: 1;
@@ -174,12 +172,28 @@
         flex: 1;
         text-align: left;
     }
-    /* Ajuste para evitar quebra e alinhamento */
+    .movimentacoes-container .movements-table tbody td:nth-child(5)::before {
+        content: "Responsável:";
+        font-weight: 600;
+        color: var(--primary, #4361ee);
+        flex: 1;
+        text-align: left;
+    }
+    .movimentacoes-container .movements-table tbody td:nth-child(6)::before {
+        content: "Motivo:";
+        font-weight: 600;
+        color: var(--primary, #4361ee);
+        flex: 1;
+        text-align: left;
+    }
+
     .movimentacoes-container .movements-table tbody td::before {
         margin-right: 10px;
         white-space: nowrap;
     }
 }
+
+/* Menu mobile */
 .menu-mobile {
   position: fixed;
   top: 0;
@@ -191,18 +205,16 @@
   z-index: 1000;
   padding: 20px;
   box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-  
   transform: translateX(-100%);
   transition: transform 0.3s ease;
-  display: none; /* oculto por padrão */
+  display: none;
 }
 
 .menu-mobile.open {
   transform: translateX(0);
-  display: block; /* mostra quando aberto */
+  display: block;
 }
 
-/* Mobile - mostrar menu e botão menu */
 @media (max-width: 768px) {
   .desktop-nav {
     display: none;
@@ -211,6 +223,6 @@
     display: block;
   }
   .menu-mobile {
-    display: block; /* mostra menu mobile no mobile (mas fora da tela, via transform) */
+    display: block;
   }
 }

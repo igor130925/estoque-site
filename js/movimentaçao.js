@@ -30,13 +30,12 @@ async function carregarMovimentacoes() {
       const nomeProduto = mov.produtos?.nome?.toLowerCase() || '';
       const motivo = mov.motivo?.toLowerCase() || '';
       const responsavel = mov.responsavel?.toLowerCase() || '';
-      const destino = mov.destino?.toLowerCase() || '';
 
+      // Destino removido daqui
       return (
         nomeProduto.includes(buscaTexto) ||
         motivo.includes(buscaTexto) ||
-        responsavel.includes(buscaTexto) ||
-        destino.includes(buscaTexto)
+        responsavel.includes(buscaTexto)
       );
     });
 
@@ -56,7 +55,7 @@ function preencherTabela(movimentacoes) {
     const nomeProduto = mov.produtos?.nome || '-';
     const tipo = mov.tipo || '-';
     const quantidade = mov.quantidade != null ? mov.quantidade : '-';
-    const destino = mov.destino || '-';
+    // const destino = mov.destino || '-';  // Removido
     const responsavel = mov.responsavel || '-';
     const motivo = mov.motivo || '-';
 
@@ -66,7 +65,6 @@ function preencherTabela(movimentacoes) {
       <td>${nomeProduto}</td>
       <td>${tipo}</td>
       <td>${quantidade}</td>
-      <td>${destino}</td>
       <td>${responsavel}</td>
       <td>${motivo}</td>
     `;
