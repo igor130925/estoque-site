@@ -251,3 +251,37 @@ body {
     height: 35px;
     font-size: 1.2rem;
 };
+.menu-mobile {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100%;
+  background-color: #2c3e50;
+  color: white;
+  z-index: 1000;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  display: none; /* oculto por padrão */
+}
+
+.menu-mobile.open {
+  transform: translateX(0);
+  display: block; /* mostra quando aberto */
+}
+
+/* Mobile - mostrar menu e botão menu */
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none;
+  }
+  .menu-btn {
+    display: block;
+  }
+  .menu-mobile {
+    display: block; /* mostra menu mobile no mobile (mas fora da tela, via transform) */
+  }
+}
