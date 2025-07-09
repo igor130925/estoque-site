@@ -19,7 +19,7 @@ async function loadUsers() {
     .select('id, name, personcode, admin, autorizado');
 
   if (error) {
-    console.error('Erro ao buscar usuários:', error.message);
+    showErrorMessage('Erro ao buscar usuários: ' + error.message);
     return;
   }
 
@@ -29,7 +29,6 @@ async function loadUsers() {
   data.forEach(user => {
     const tr = document.createElement('tr');
 
-    // Condicional: só exibe botões se não for admin
     let actionButtons = '';
     if (!user.admin) {
       actionButtons = `
@@ -68,12 +67,12 @@ function addEventListeners() {
         .single();
 
       if (fetchError || !userData) {
-        alert('Erro ao verificar usuário');
+        showErrorMessage('Erro ao verificar usuário');
         return;
       }
 
       if (userData.admin) {
-        alert('Não é permitido alterar a autorização de um administrador.');
+        showErrorMessage('Não é permitido alterar a autorização de um administrador.');
         return;
       }
 
@@ -85,10 +84,11 @@ function addEventListeners() {
         .eq('id', userId);
 
       if (error) {
-        alert('Erro ao atualizar autorização');
+        showErrorMessage('Erro ao atualizar autorização');
         return;
       }
 
+      showSuccessMessage(novoStatus ? 'Usuário autorizado com sucesso!' : 'Autorização removida com sucesso!');
       loadUsers();
     });
   });
@@ -104,30 +104,84 @@ function addEventListeners() {
         .single();
 
       if (fetchError || !userData) {
-        alert('Erro ao verificar usuário');
+        showErrorMessage('Erro ao verificar usuário');
         return;
       }
 
       if (userData.admin) {
-        alert('Não é permitido excluir um administrador.');
+        showErrorMessage('Não é permitido excluir um administrador.');
         return;
       }
 
-      const confirmDelete = confirm('Tem certeza que deseja excluir este usuário?');
-      if (!confirmDelete) return;
+      showConfirmationDialog('Tem certeza que deseja excluir este usuário?', async () => {
+        const { error } = await supabase
+          .from('usuarios')
+          .delete()
+          .eq('id', userId);
 
-      const { error } = await supabase
-        .from('usuarios')
-        .delete()
-        .eq('id', userId);
+        if (error) {
+          showErrorMessage('Erro ao excluir usuário');
+          return;
+        }
 
-      if (error) {
-        alert('Erro ao excluir usuário');
-        return;
-      }
-
-      loadUsers();
+        showSuccessMessage('Usuário excluído com sucesso!');
+        loadUsers();
+      });
     });
+  });
+}
+
+function showSuccessMessage(text) {
+  const successBox = document.createElement('div');
+  successBox.className = 'success-message';
+  successBox.innerHTML = `<i class="fas fa-check-circle"></i><span>${text}</span>`;
+  document.body.appendChild(successBox);
+
+  setTimeout(() => {
+    successBox.style.opacity = '0';
+    successBox.style.transform = 'translateX(-50%) translateY(-10px)';
+    setTimeout(() => successBox.remove(), 500);
+  }, 4000);
+}
+
+function showErrorMessage(text) {
+  const errorBox = document.createElement('div');
+  errorBox.className = 'success-message';
+  errorBox.style.backgroundColor = '#dc3545';
+  errorBox.innerHTML = `<i class="fas fa-exclamation-circle"></i><span>${text}</span>`;
+  document.body.appendChild(errorBox);
+
+  setTimeout(() => {
+    errorBox.style.opacity = '0';
+    errorBox.style.transform = 'translateX(-50%) translateY(-10px)';
+    setTimeout(() => errorBox.remove(), 500);
+  }, 4000);
+}
+
+function showConfirmationDialog(message, onConfirm) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+
+  const modal = document.createElement('div');
+  modal.className = 'confirmation-modal';
+  modal.innerHTML = `
+    <p>${message}</p>
+    <div class="modal-actions">
+      <button class="modal-cancel">Cancelar</button>
+      <button class="modal-confirm">Excluir</button>
+    </div>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  overlay.querySelector('.modal-cancel').addEventListener('click', () => {
+    overlay.remove();
+  });
+
+  overlay.querySelector('.modal-confirm').addEventListener('click', () => {
+    overlay.remove();
+    if (typeof onConfirm === 'function') onConfirm();
   });
 }
 

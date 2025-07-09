@@ -114,3 +114,69 @@
         font-size: 0.9rem;
     }
 }
+
+/* Melhorias extras para mobile abaixo */
+
+/* Em telas pequenas, transformar tabela em cards para melhor leitura */
+@media (max-width: 480px) {
+    .movimentacoes-container .movements-table thead {
+        /* Esconde o cabeçalho da tabela */
+        display: none;
+    }
+
+    .movimentacoes-container .movements-table tbody tr {
+        display: block;
+        margin-bottom: 15px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+        border-radius: 8px;
+        padding: 15px;
+    }
+
+    .movimentacoes-container .movements-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 14px;
+        border-radius: 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .movimentacoes-container .movements-table tbody td:last-child {
+        border-bottom: none;
+    }
+
+    /* Adicionar labels antes dos dados para facilitar a leitura */
+    .movimentacoes-container .movements-table tbody td:nth-child(1)::before {
+        content: "Data:";
+        font-weight: 600;
+        color: var(--primary, #4361ee);
+        flex: 1;
+        text-align: left;
+    }
+    .movimentacoes-container .movements-table tbody td:nth-child(2)::before {
+        content: "Tipo:";
+        font-weight: 600;
+        color: var(--primary, #4361ee);
+        flex: 1;
+        text-align: left;
+    }
+    .movimentacoes-container .movements-table tbody td:nth-child(3)::before {
+        content: "Produto:";
+        font-weight: 600;
+        color: var(--primary, #4361ee);
+        flex: 1;
+        text-align: left;
+    }
+    .movimentacoes-container .movements-table tbody td:nth-child(4)::before {
+        content: "Quantidade:";
+        font-weight: 600;
+        color: var(--primary, #4361ee);
+        flex: 1;
+        text-align: left;
+    }
+    /* Ajuste para evitar quebra e alinhamento */
+    .movimentacoes-container .movements-table tbody td::before {
+        margin-right: 10px;
+        white-space: nowrap;
+    }
+}

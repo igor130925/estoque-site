@@ -32,14 +32,12 @@ async function carregarMovimentacoes() {
       const responsavel = mov.responsavel?.toLowerCase() || '';
       const destino = mov.destino?.toLowerCase() || '';
 
-      if (
-        !nomeProduto.includes(buscaTexto) &&
-        !motivo.includes(buscaTexto) &&
-        !responsavel.includes(buscaTexto) &&
-        !destino.includes(buscaTexto)
-      ) return false;
-
-      return true;
+      return (
+        nomeProduto.includes(buscaTexto) ||
+        motivo.includes(buscaTexto) ||
+        responsavel.includes(buscaTexto) ||
+        destino.includes(buscaTexto)
+      );
     });
 
     preencherTabela(filtrados);
@@ -54,7 +52,7 @@ function preencherTabela(movimentacoes) {
   tbody.innerHTML = '';
 
   movimentacoes.forEach(mov => {
-    const dataFormatada = mov.data ? new Date(mov.data).toLocaleString('pt-BR') : '-';
+    const dataFormatada = mov.data ? formatarData(mov.data) : '-';
     const nomeProduto = mov.produtos?.nome || '-';
     const tipo = mov.tipo || '-';
     const quantidade = mov.quantidade != null ? mov.quantidade : '-';
@@ -74,4 +72,19 @@ function preencherTabela(movimentacoes) {
     `;
     tbody.appendChild(tr);
   });
+}
+
+// Função auxiliar para formatar a data subtraindo 3h e ocultando os segundos
+function formatarData(dataISO) {
+  const data = new Date(dataISO);
+  data.setHours(data.getHours() - 3); // Subtrai 3 horas
+
+  const dia = String(data.getDate()).padStart(2, '0');
+  const mes = String(data.getMonth() + 1).padStart(2, '0');
+  const ano = data.getFullYear();
+
+  const horas = String(data.getHours()).padStart(2, '0');
+  const minutos = String(data.getMinutes()).padStart(2, '0');
+
+  return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
 }

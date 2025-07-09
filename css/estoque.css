@@ -27,9 +27,9 @@
     margin-top: 15px;
     background-color: var(--white);
     border-radius: 8px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06); /* sombra levemente mais forte */
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
     padding: 10px;
-    border: 1px solid #ccc; /* borda clara */
+    border: 1px solid #ccc;
 }
 
 table {
@@ -47,7 +47,7 @@ th, td {
     padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #e0e0e0;
-    background-color: #fafafa; /* fundo cinza-claro */
+    background-color: #fafafa;
 }
 
 th {
@@ -61,10 +61,9 @@ th {
 }
 
 tr:hover {
-    background-color: #e3f2fd; /* azul bem claro no hover */
+    background-color: #e3f2fd;
     transition: background-color 0.3s ease;
 }
-
 
 /* Modal */
 .modal {
@@ -117,60 +116,48 @@ tr:hover {
     color: var(--white);
 }
 
-/* Animação */
 @keyframes fadeIn {
     from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
 }
 
-/* Responsividade */
+/* Responsividade aprimorada */
 @media (max-width: 768px) {
     .filtros {
         flex-direction: column;
         gap: 10px;
+        padding: 12px;
+    }
+
+    .filtros .form-group {
+        min-width: 100%;
     }
 
     th, td {
         padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+
+    table {
+        font-size: 0.85rem;
+    }
+
+    .modal-content {
+        width: 95%;
     }
 }
 
-/* ✅ Fundo branco para toda a página */
 body {
-   background-color: #f0f0f0;
-
-}
-/* Notificação simples e elegante */
-.notification {
-    position: fixed;
-    top: 20px;       /* distância do topo */
-    left: 50%;       /* meio da tela horizontalmente */
-    transform: translateX(-50%) translateY(-20px);
-    background-color: #4BB543; /* verde sucesso */
-    color: white;
-    padding: 15px 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(75, 181, 67, 0.4);
-    font-weight: 600;
-    font-size: 1.1rem;
-    z-index: 2000;
-    opacity: 0;
-    transition: opacity 0.4s ease, transform 0.4s ease;
-    pointer-events: none; /* para não bloquear cliques */
+    background-color: #f0f0f0;
 }
 
-.notification.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-    pointer-events: auto;
-}
-
+/* Notificação elegante */
 .notification {
     position: fixed;
     top: 20px;
     left: 50%;
     transform: translateX(-50%) translateY(-20px);
-    background-color: #4caf50; /* verde sucesso por padrão */
+    background-color: #4caf50;
     color: white;
     padding: 1rem 1.5rem;
     border-radius: 8px;
@@ -196,7 +183,8 @@ body {
 .notification.error {
     background-color: #e74c3c;
 }
-/* Modal para galeria de imagens */
+
+/* Modal galeria de imagens */
 #modalGaleria {
     display: none;
     position: fixed;
@@ -262,5 +250,4 @@ body {
     width: 35px;
     height: 35px;
     font-size: 1.2rem;
-}
-
+};

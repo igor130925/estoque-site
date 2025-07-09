@@ -25,8 +25,6 @@ body {
     padding: 0;
 }
 
-
-
 .container {
     width: 100%;
     max-width: 1200px;
@@ -148,6 +146,18 @@ body {
     
     .btn {
         width: 100%;
+    }
+    
+    .desktop-nav {
+        display: none;
+    }
+    
+    .menu-btn {
+        display: block;
+    }
+    
+    .success-message {
+        width: 80%;
     }
 }
 
@@ -355,21 +365,6 @@ body {
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
-    .desktop-nav {
-        display: none;
-    }
-    
-    .menu-btn {
-        display: block;
-    }
-    
-    .success-message {
-        width: 80%;
-    }
-    
-}
 .form-errors {
   margin-bottom: 15px;
   padding: 10px;
@@ -388,6 +383,7 @@ body {
   border-color: #cc0000 !important;
   background-color: #fff5f5;
 }
+
 /* Menu mobile com animação */
 .menu-mobile {
   transform: translateX(-100%);
@@ -398,6 +394,7 @@ body {
 .menu-mobile.open {
   transform: translateX(0);
 }
+
 .user-table {
   width: 100%;
   border-collapse: collapse;
@@ -426,4 +423,107 @@ body {
 
 .user-table button.remove {
   background-color: #dc3545;
+}
+
+/* ----- MELHORIAS PARA MOBILE (até 480px) ----- */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 10px;
+  }
+
+  .card {
+    border-radius: 6px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-header {
+    padding: 12px 15px;
+  }
+
+  .card-header h1, .card-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .card-body {
+    padding: 15px;
+  }
+
+  .form-group {
+    margin-bottom: 12px;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 0.9rem;
+    padding: 8px 10px;
+  }
+
+  .input-with-button {
+    flex-direction: column;
+  }
+
+  .input-with-button input {
+    flex: none;
+    width: 100%;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 12px 0;
+    font-size: 1rem;
+  }
+
+  .menu-mobile {
+    width: 220px;
+    padding: 15px;
+  }
+
+  .menu-mobile nav li {
+    margin-bottom: 12px;
+  }
+
+  .menu-mobile nav a {
+    font-size: 0.95rem;
+  }
+
+  .success-message {
+    font-size: 0.9rem;
+    padding: 10px 15px;
+    width: 90%;
+  }
+
+  .user-table th,
+  .user-table td {
+    padding: 6px 4px;
+    font-size: 0.85rem;
+  }
+
+  .user-table button {
+    padding: 5px 8px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Ajustes intermediários entre 481px e 768px para melhorar espaçamento */
+@media (max-width: 768px) and (min-width: 481px) {
+  .input-with-button {
+    flex-direction: column;
+  }
+
+  .input-with-button input {
+    width: 100%;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
 }

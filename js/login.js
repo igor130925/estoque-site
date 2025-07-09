@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('currentUser', JSON.stringify(perfil));
 
       // Redirecionar para o painel principal (perfil, estoque, etc)
-      window.location.href = 'perfil.html';
+      window.location.href = 'estoque.html';
 
     } catch (err) {
       console.error(err);

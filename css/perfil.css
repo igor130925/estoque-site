@@ -236,3 +236,75 @@
     from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
+
+/* ----- MELHORIAS PARA MOBILE (ate 480px) ----- */
+@media (max-width: 480px) {
+    .profile-container {
+        margin: 20px 10px;
+        padding: 20px 15px;
+        border-radius: 8px;
+    }
+
+    .profile-container h1 {
+        font-size: 1.4rem;
+        margin-bottom: 20px;
+    }
+
+    .profile-section {
+        gap: 20px;
+    }
+
+    .avatar-container {
+        min-width: auto;
+    }
+
+    .avatar-container img {
+        width: 110px;
+        height: 110px;
+    }
+
+    #changeAvatarBtn {
+        padding: 8px 14px;
+        font-size: 0.9rem;
+    }
+
+    .profile-info {
+        width: 100%;
+    }
+
+    .password-section {
+        margin-top: 30px;
+        padding-top: 20px;
+    }
+
+    .password-section h2 {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 12px 0;
+        font-size: 1rem;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 12px 0;
+        font-size: 1rem;
+    }
+
+    .form-group label {
+        font-size: 0.95rem;
+    }
+
+    .form-control {
+        font-size: 1rem;
+        padding: 10px 12px;
+    }
+    
+    .message-box {
+        font-size: 1rem;
+        padding: 12px 15px;
+    }
+}
