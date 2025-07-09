@@ -407,6 +407,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             case 'eletronico': return 'Eletrônico';
             case 'moveis': return 'Móveis';
             case 'ferramentas': return 'Ferramentas';
+            case 'outro': return 'Outros';
             default: return tipo;
         }
     }
@@ -418,6 +419,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             case 'eletronico': return '📱';
             case 'moveis': return '🛋️';
             case 'ferramentas': return '🔧';
+            case 'outros': return '❓';
             default: return '❓';
         }
     }
